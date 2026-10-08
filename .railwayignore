@@ -1,0 +1,16 @@
+node_modules
+.next
+dist
+.data
+.env
+.env.local
+.env.production
+.env.production.local
+.git
+.wrangler
+.sites-runtime
+.openai
+work
+examples
+outputs
+*.tsbuildinfo

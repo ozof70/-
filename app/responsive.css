@@ -1,8 +1,8 @@
 /* Shared account controls: one sizing rule across every page and language. */
 html .preferences-controls { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-shrink:0; }
 html .preferences-controls :is(.theme-switch,.language-switch) {
-  display:inline-flex; justify-content:center; align-items:center; gap:6px;
-  width:88px; min-width:88px; height:44px; min-height:44px; padding:0 7px;
+  display:inline-flex; justify-content:center; align-items:center; gap:4px;
+  width:76px; min-width:76px; height:44px; min-height:44px; padding:0 4px;
   font-size:12px; line-height:1.2; white-space:nowrap; border-radius:3px;
   border:1px solid var(--border); background:var(--card); color:var(--foreground);
 }

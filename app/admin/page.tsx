@@ -1,3 +1,4 @@
+export const metadata={title:'管理後台｜COZ COS CLOSET',robots:{index:false,follow:false},alternates:{canonical:null}};
 import {getAppUser} from '@/lib/auth';
 import {isAdmin} from '@/lib/admin-auth';
 import {redirect} from 'next/navigation';

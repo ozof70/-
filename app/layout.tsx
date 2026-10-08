@@ -1,3 +1,4 @@
+import {SITE_ORIGIN,SITE_DESCRIPTION,publicMetadata} from '@/lib/seo';
 import type { Metadata } from "next";
 import "./globals.css";
 import "./preferences.css";
@@ -5,12 +6,11 @@ import {cookies} from "next/headers";
 import {PreferencesProvider} from "./preferences";
 
 export const metadata: Metadata = {
-  title: "COZ COS CLOSET｜共用衣櫃",
-  description: "下一個角色，換你登場。探索 Cos 服裝、分享衣櫃，讓熱愛再次出場。",
-  icons: {
-    icon: "/coz-logo-transparent.png",
-    shortcut: "/coz-logo-transparent.png",
-  },
+  metadataBase: new URL(SITE_ORIGIN),
+  ...publicMetadata("COZ COS CLOSET｜Cosplay 服裝租借・共用衣櫃", SITE_DESCRIPTION, "/"),
+  robots: {index:true,follow:true,googleBot:{index:true,follow:true,"max-image-preview":"large","max-snippet":-1,"max-video-preview":-1}},
+  verification: {google:process.env.GOOGLE_SITE_VERIFICATION},
+  icons: {icon:"/coz-logo-transparent.png",shortcut:"/coz-logo-transparent.png"},
 };
 
 export default async function RootLayout({

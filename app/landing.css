@@ -38,3 +38,5 @@ html[data-theme=light] .hero-orbit.hero-ellipse{border-color:#8860b866}html[data
 /* Keep exactly three visible orbit lines behind the costume. */
 .showcase-halo,.showcase-halo:after{border:0}
 
+
+.portal-about{max-width:1240px;margin:0 auto;padding:64px 5%;border-bottom:1px solid var(--border)}.portal-about h2{font-size:clamp(23px,3vw,35px);font-weight:750;max-width:800px;margin:12px 0 18px;line-height:1.4}.portal-about p{max-width:880px;font-size:15px;line-height:1.95;color:var(--muted-foreground)}@media(max-width:600px){.portal-about{padding:40px 24px}.portal-about p{font-size:14px}}

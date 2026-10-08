@@ -11,7 +11,7 @@ export function PreferencesProvider({children,initialLanguage,initialTheme}:{chi
  const [showTop,setShowTop]=useState(false);
  useEffect(()=>{const update=()=>setShowTop(window.scrollY>220);update();window.addEventListener("scroll",update,{passive:true});return()=>window.removeEventListener("scroll",update)},[]);
  const t=(text:string)=>language==='en'?(english[text]??text):text;
- useEffect(()=>{document.documentElement.lang=language==='en'?'en':'zh-Hant';document.documentElement.dataset.theme=theme;document.documentElement.dataset.language=language;document.cookie=`cos_language=${language}; Path=/; Max-Age=31536000; SameSite=Lax`;document.cookie=`cos_theme=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`;document.title=language==='en'?'COZ COS CLOSET | Shared cosplay wardrobe':'COZ COS CLOSET｜共用衣櫃'},[language,theme]);
+ useEffect(()=>{document.documentElement.lang=language==='en'?'en':'zh-Hant';document.documentElement.dataset.theme=theme;document.documentElement.dataset.language=language;document.cookie=`cos_language=${language}; Path=/; Max-Age=31536000; SameSite=Lax`;document.cookie=`cos_theme=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`},[language,theme]);
  return <Preferences.Provider value={{language,theme,t,setLanguage,setTheme}}><div id="page-top" tabIndex={-1}/>{children}{showTop&&<button className="back-top" aria-label={t("回到頂端")} onClick={()=>{window.scrollTo({top:0,left:0,behavior:"instant"});document.getElementById("page-top")?.focus({preventScroll:true})}}><ArrowUp size={19}/><span>{t("回到頂端")}</span></button>}</Preferences.Provider>
 }
 

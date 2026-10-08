@@ -60,3 +60,7 @@ Next.js、React、TypeScript、Tailwind、Radix、Node.js SQLite、Drizzle SQL �
 ## 管理後台
 
 `/admin` 提供服裝上下架、租借取消、會員查詢與操作紀錄。僅指定 Google 管理員可使用；設定與操作方式見 [管理後台說明](docs/ADMIN.md)。
+
+## Google 搜尋與 SEO
+
+公開頁面提供專屬 metadata、canonical、品牌 JSON-LD、網站地圖、robots.txt 與 PNG 分享圖。Search Console 設定、收錄檢查與驗證指令見 [SEO 說明](docs/SEO.md)。

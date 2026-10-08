@@ -1,4 +1,8 @@
 export const english:Record<string,string> = {
+  "管理後台": "Administration",
+  "Cosplay 服裝租借，讓衣櫃裡的熱愛再次登場。": "Cosplay rentals. Let your wardrobe take the stage again.",
+  "COZ COS CLOSET 是以 Cosplay 服裝租借與分享為主的共用衣櫃平台。無論是動漫、遊戲角色或原創服裝，都能查看照片、服裝品牌與尺寸資訊，依地區和租期尋找合適的裝備；出租者也能上架自己的 Cos 服裝，讓更多同好延續角色的故事。": "COZ COS CLOSET is a shared wardrobe for renting and sharing cosplay outfits. Explore anime, game and original costumes, check photos, brands and sizing, and find an outfit by location and rental dates. Owners can also list their cosplay outfits so another fan can continue the story.",
+
 "準備中":"Coming soon",
 "使用 LINE 登入":"Log in with LINE",
 "LINE 登入尚未啟用，請先使用 Google 登入。":"LINE login is not available yet. Please use Google.",

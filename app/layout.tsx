@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   ...publicMetadata("COZ COS CLOSET｜Cosplay 服裝租借・共用衣櫃", SITE_DESCRIPTION, "/"),
   robots: {index:true,follow:true,googleBot:{index:true,follow:true,"max-image-preview":"large","max-snippet":-1,"max-video-preview":-1}},
   verification: {google:process.env.GOOGLE_SITE_VERIFICATION},
-  icons: {icon:"/coz-logo-transparent.png",shortcut:"/coz-logo-transparent.png"},
+  applicationName:"COZ COS CLOSET",
+  icons: {icon:[{url:"/brand-icon.png",type:"image/png",sizes:"512x512"}],shortcut:"/brand-icon.png",apple:"/brand-icon.png"},
 };
 
 export default async function RootLayout({

@@ -49,8 +49,6 @@ html[data-theme=light] .hero-orbit.hero-ellipse{border-color:#8860b866}html[data
 .quest-card-meta { display:flex; align-items:center; gap:8px; color:var(--lavender); }
 .quest-card-meta > span { margin-left:auto; font:9px monospace; letter-spacing:.08em; }
 .quest-card-title { display:block; margin-top:28px; font-size:17px; font-weight:650; }
-.quest-chevron { transition:transform .2s; }
-.quest-card[data-open=true] .quest-chevron { transform:rotate(180deg); }
 .portal-page .quest-card[data-open=true] { border-color:var(--lavender); background:#34284d; color:#f7f5ff; }
 .portal-page .quest-card[data-open=true] .quest-card-meta { color:#d9caff; }
 .portal-page .quest-card[data-open=true] .quest-description { color:#e6ddf2; }
@@ -60,3 +58,14 @@ html[data-theme=light] .portal-page .quest-card[data-open=true] .quest-descripti
 .portal-page .quest-card .quest-description { padding:0 22px 25px; margin:0; }
 .quest-description[hidden] { display:none; }
 @media(max-width:650px) { .quest-toggle { padding:22px; } .quest-card-title { margin-top:17px; } .quest-card-meta > span { font-size:10px; } }
+
+/* A gentle, continuous lavender-to-purple wash with legible text. */
+html[data-theme] .portal-page .portal-finale {
+  background:linear-gradient(120deg,#f1e5ff 0%,#cdb2ec 30%,#a47acb 60%,#e7d6f8 100%);
+  background-size:300% 300%;
+  animation:finale-gradient 12s ease-in-out infinite alternate;
+  color:#2a153e; border-color:#a47acb;
+}
+html[data-theme] .portal-page .portal-finale > span, html[data-theme] .portal-page .portal-finale small { color:#47305d; }
+@keyframes finale-gradient { from { background-position:0% 50%; } to { background-position:100% 50%; } }
+@media(prefers-reduced-motion:reduce) { html[data-theme] .portal-page .portal-finale { animation:none; background-position:50% 50%; } }

@@ -40,3 +40,18 @@ html[data-theme=light] .hero-orbit.hero-ellipse{border-color:#8860b866}html[data
 
 
 .portal-about{max-width:1240px;margin:0 auto;padding:64px 5%;border-bottom:1px solid var(--border)}.portal-about h2{font-size:clamp(23px,3vw,35px);font-weight:750;max-width:800px;margin:12px 0 18px;line-height:1.4}.portal-about p{max-width:880px;font-size:15px;line-height:1.95;color:var(--muted-foreground)}@media(max-width:600px){.portal-about{padding:40px 24px}.portal-about p{font-size:14px}}
+
+/* Cards disclose their descriptions on hover, click or keyboard activation. */
+.quest-grid { align-items:start; }
+.portal-page .quest-card { padding:0; transition:border-color .2s,background .2s; }
+.portal-page .quest-card h3 { margin:0; }
+.quest-toggle { display:block; width:100%; padding:25px 22px; text-align:left; background:transparent; color:inherit; border:0; border-radius:3px; }
+.quest-card-meta { display:flex; align-items:center; gap:8px; color:var(--lavender); }
+.quest-card-meta > span { margin-left:auto; font:9px monospace; letter-spacing:.08em; }
+.quest-card-title { display:block; margin-top:28px; font-size:17px; font-weight:650; }
+.quest-chevron { transition:transform .2s; }
+.quest-card[data-open=true] .quest-chevron { transform:rotate(180deg); }
+.quest-card[data-open=true] { border-color:var(--lavender); }
+.portal-page .quest-card .quest-description { padding:0 22px 25px; margin:0; }
+.quest-description[hidden] { display:none; }
+@media(max-width:650px) { .quest-toggle { padding:22px; } .quest-card-title { margin-top:17px; } .quest-card-meta > span { font-size:10px; } }

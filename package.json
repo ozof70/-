@@ -11,7 +11,8 @@
     "build": "next build --webpack",
     "start": "node scripts/migrate.mjs && next start --hostname 0.0.0.0",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "test:admin": "node scripts/test-admin.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

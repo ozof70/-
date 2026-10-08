@@ -2,6 +2,7 @@ import {SITE_ORIGIN,SITE_DESCRIPTION,publicMetadata} from '@/lib/seo';
 import type { Metadata } from "next";
 import "./globals.css";
 import "./preferences.css";
+import "./responsive.css";
 import {cookies} from "next/headers";
 import {PreferencesProvider} from "./preferences";
 

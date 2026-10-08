@@ -7,10 +7,12 @@
 在 Railway 服務 Variables 設定：
 
 ```
-ADMIN_GOOGLE_EMAILS=dennis02101014@gmail.com
+ADMIN_GOOGLE_EMAILS=dennis02101014@gmail.com,yixuan9512@gmail.com
 ```
 
-必須使用此帳號的 **Google 登入**。管理員由伺服器檢查已驗證的 Google 身分與 Email；未設定名單時不開放任何管理員。LINE、Apple 或同名帳號不會因此取得權限。登入後在探索衣櫃右上方點「管理後台」，或直接開啟 `/admin`。
+必須使用名單內帳號的 **Google 登入**。管理員由伺服器檢查已驗證的 Google 身分與 Email；未設定名單時不開放任何管理員。LINE、Apple 或同名帳號不會因此取得權限。登入後在探索衣櫃右上方點「管理後台」，或直接開啟 `/admin`。
+
+Google 登入會儲存已驗證身分提供的頭貼網址，並在衣櫃與後台顯示。既有帳號請重新登入一次；沒有頭貼或圖片載入失敗時顯示姓名首字。新增 `0004_google_profile_picture.sql` 遷移只加入可空的頭貼欄位，保留既有帳號與租借資料。
 
 ## 功能
 

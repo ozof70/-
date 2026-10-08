@@ -1,12 +1,13 @@
 'use client';
 import {useEffect,useState,type FormEvent} from 'react';
 import {PreferenceControls,useLocale} from '../preferences';
+import AccountAvatar from '../account-avatar';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 type Kind='items'|'bookings'|'members'|'audit';
 type Row={id:string;title?:string;series?:string;ownerName?:string;size?:string;city?:string;price?:number;active?:number;moderationReason?:string;created?:number;renterName?:string;start?:string;end?:string;status?:string;total?:number;name?:string;email?:string;listings?:number;rentals?:number;actorName?:string;action?:string;target?:string;reason?:string};
 type Summary={items:number;active:number;members:number;pending:number;accepted:number};
 type Selection={row:Row;action:'moderate'|'cancel';active?:boolean};
-export default function AdminPanel({name}:{name:string}){
+export default function AdminPanel({name,picture}:{name:string;picture?:string|null}){
  const {language}=useLocale();const L=(zh:string,en:string)=>language==='en'?en:zh;
  const [kind,setKind]=useState<Kind>('items'),[search,setSearch]=useState(''),[q,setQ]=useState(''),[page,setPage]=useState(1),[reload,setReload]=useState(0);
  const [rows,setRows]=useState<Row[]>([]),[summary,setSummary]=useState<Summary|null>(null),[more,setMore]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[message,setMessage]=useState('');
@@ -20,7 +21,7 @@ export default function AdminPanel({name}:{name:string}){
  const date=(n?:number)=>n?new Intl.DateTimeFormat(language==='en'?'en-US':'zh-TW',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Taipei'}).format(n):'—';
  const money=(n?:number)=>`NT$ ${(n??0).toLocaleString()}`;
  const tabs:[Kind,string][]=[['items',L('服裝管理','Listings')],['bookings',L('租借管理','Rentals')],['members',L('會員查詢','Members')],['audit',L('操作紀錄','Audit log')]];
- return <div className="admin-shell"><header className="admin-header"><a className="brand" href="/"><img src="/coz-logo-transparent.png" width="40" height="40" alt=""/><span>COZ COS CLOSET<small>{L('管理後台','Administration')}</small></span></a><div className="admin-account"><PreferenceControls/><a href="/explore">{L('探索衣櫃','Explore')}</a><form action="/api/auth/logout" method="post"><button>{L('登出','Sign out')}</button></form></div></header>
+ return <div className="admin-shell"><header className="admin-header"><a className="brand" href="/"><img src="/coz-logo-transparent.png" width="40" height="40" alt=""/><span>COZ COS CLOSET<small>{L('管理後台','Administration')}</small></span></a><div className="admin-account"><PreferenceControls/><AccountAvatar name={name} picture={picture}/><a href="/explore">{L('探索衣櫃','Explore')}</a><form action="/api/auth/logout" method="post"><button>{L('登出','Sign out')}</button></form></div></header>
  <main className="admin-main"><div className="admin-heading"><div><p className="admin-eyebrow">WARDROBE OPERATIONS</p><h1>{L('管理後台','Administration')}</h1><p>{L('歡迎回來，','Welcome back, ')}{name}</p></div><button onClick={()=>setReload(v=>v+1)} disabled={loading}>{L('重新整理','Refresh')}</button></div>
  <section className="admin-stats" aria-label={L('網站統計','Site statistics')}>{([['items',L('服裝總數','Total listings')],['active',L('上架中','Active listings')],['members',L('會員','Members')],['pending',L('待確認租借','Pending rentals')],['accepted',L('已確認租借','Accepted rentals')]] as [keyof Summary,string][]).map(([key,label])=><div key={key}><span>{label}</span><strong>{summary?summary[key].toLocaleString():'—'}</strong></div>)}</section>
  <nav className="admin-tabs" aria-label={L('管理功能','Management sections')}>{tabs.map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>{setKind(value);setPage(1);setQ('');setSearch('');setMessage('')}}>{label}</button>)}</nav>

@@ -2,6 +2,7 @@ import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {database} from '@/db/raw';
 import {digest,googleConfig,randomToken,readCookie,SESSION_AGE,SESSION_COOKIE,STATE_COOKIE,tokenCookie} from '@/lib/auth';
 import {trustedOrigin} from '@/lib/runtime-env';
+import {googleProfilePicture} from '@/lib/profile-picture';
 export const dynamic='force-dynamic';
 const googleKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
 export async function GET(req:Request){
@@ -21,7 +22,7 @@ export async function GET(req:Request){
   if(payload.nonce!==attempt.nonce||(payload.azp&&payload.azp!==cfg.clientId)||payload.email_verified!==true||typeof payload.email!=='string'||typeof payload.sub!=='string')return redirect('/login?error=failed');
   const id='google:'+payload.sub;const name=typeof payload.name==='string'&&payload.name.trim()?payload.name.trim().slice(0,80):'Coser';const session=randomToken();const oldSession=readCookie(req.headers.get('cookie'),SESSION_COOKIE);
   await db.batch([
-   db.prepare('INSERT INTO users (id,email,name,created) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET email=excluded.email,name=excluded.name').bind(id,payload.email,name,Date.now()),
+   db.prepare('INSERT INTO users (id,email,name,created,picture) VALUES (?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET email=excluded.email,name=excluded.name,picture=excluded.picture').bind(id,payload.email,name,Date.now(),googleProfilePicture(payload.picture)),
    db.prepare('DELETE FROM sessions WHERE expires<? OR hash=?').bind(Date.now(),await digest(oldSession)),
    db.prepare('INSERT INTO sessions (hash,userId,expires) VALUES (?,?,?)').bind(await digest(session),id,Date.now()+SESSION_AGE*1000),
   ]);

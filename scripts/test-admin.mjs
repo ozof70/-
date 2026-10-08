@@ -2,7 +2,7 @@ import ts from '../node_modules/typescript/lib/typescript.js';
 import {readFileSync,readdirSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import assert from 'node:assert/strict';import {createRequire} from 'node:module';
 const require=createRequire(new URL('../package.json',import.meta.url));const z=require('zod').z;
 const db=new DatabaseSync(':memory:');db.exec('PRAGMA foreign_keys=ON');for(const f of readdirSync('drizzle').filter(f=>f.endsWith('.sql')).sort())db.exec(readFileSync('drizzle/'+f,'utf8'));
-const now=Date.now();db.prepare('INSERT INTO users VALUES (?,?,?,?)').run('google:admin','admin@example.com','Admin',now);db.prepare('INSERT INTO users VALUES (?,?,?,?)').run('google:owner','owner@example.com','Owner',now);
+const now=Date.now();db.prepare('INSERT INTO users (id,email,name,created) VALUES (?,?,?,?)').run('google:admin','admin@example.com','Admin',now);db.prepare('INSERT INTO users (id,email,name,created) VALUES (?,?,?,?)').run('google:owner','owner@example.com','Owner',now);
 const insert=db.prepare('INSERT INTO items (id,owner,ownerName,title,series,size,city,price,deposit,description,delivery,image,created,active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,1)');insert.run('item','google:owner','Owner','Test costume','ACG','M','Taipei',100,500,'Test description','面交','/test.png',now);insert.run('literal','google:owner','Owner','100% dress','ACG','M','Taipei',100,500,'Test description','面交','/test.png',now);
 db.prepare('INSERT INTO bookings VALUES (?,?,?,?,?,?,?,?)').run('booking','item','google:owner','Owner','2026-12-01','2026-12-02','accepted',200);
 class Statement{constructor(sql,values=[]){this.sql=sql;this.values=values}bind(...values){return new Statement(this.sql,values)}async first(){return db.prepare(this.sql).get(...this.values)}async all(){return {results:db.prepare(this.sql).all(...this.values)}}runSync(){return db.prepare(this.sql).run(...this.values)}}
@@ -21,5 +21,8 @@ const ownerSource=readFileSync('app/api/closet/route.ts','utf8');const ownerSql=
 assert.equal((await post({...hide,expectedActive:0,active:true,reason:'Issue resolved'})).status,200);assert.equal(db.prepare('SELECT COUNT(*) n FROM item_moderation').get().n,0);
 const cancel={action:'cancel',id:'booking',expectedStatus:'accepted',reason:'Confirmed with parties'};assert.equal((await post(cancel)).status,200);assert.equal((await post(cancel)).status,409);assert.equal(db.prepare('SELECT COUNT(*) n FROM admin_audit').get().n,3);
 for(const kind of ['items','bookings','members','audit'])assert.equal((await get('?kind='+kind)).status,200);
+process.env.ADMIN_GOOGLE_EMAILS='dennis02101014@gmail.com,yixuan9512@gmail.com';
+for(const email of ['dennis02101014@gmail.com','yixuan9512@gmail.com']){assert.equal(isAdmin({userId:'google:test',email}),true);assert.equal(isAdmin({userId:'line:test',email}),false)}
+assert.equal(isAdmin({userId:'google:test',email:'other@example.com'}),false);
 process.env.ADMIN_GOOGLE_EMAILS='';assert.equal(isAdmin(user),false);
 console.log('PASS: admin auth, Google-only identity, CSRF, validation, literal search, moderation, owner relist prevention, restoration, cancellation, optimistic conflicts and audit history.');db.close();delete globalThis.adminTest;

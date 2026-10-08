@@ -1,0 +1,120 @@
+/* Shared account controls: one sizing rule across every page and language. */
+html .preferences-controls { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-shrink:0; }
+html .preferences-controls :is(.theme-switch,.language-switch) {
+  display:inline-flex; justify-content:center; align-items:center; gap:6px;
+  width:88px; min-width:88px; height:44px; min-height:44px; padding:0 7px;
+  font-size:12px; line-height:1.2; white-space:nowrap; border-radius:3px;
+  border:1px solid var(--border); background:var(--card); color:var(--foreground);
+}
+html .preferences-controls button:hover { background:var(--muted); }
+html .portal-nav nav { gap:8px; justify-content:flex-end; }
+html .portal-nav .about-link { margin-right:12px; }
+html .portal-nav .portal-login,html .app .header-account .login-link {
+  display:inline-flex; justify-content:center; align-items:center; width:88px;
+  min-width:88px; height:48px; padding:0 8px; font-size:14px; font-weight:600;
+  border:1px solid var(--border); border-radius:3px; white-space:nowrap;
+}
+html .portal-nav .portal-login { border-color:#ffffff35; }
+html[data-theme=light] .portal-nav .portal-login { border-color:#d2c2e0; }
+html .app .header { height:auto; min-height:92px; padding-top:16px; padding-bottom:16px; }
+html .app .header-account { gap:8px; flex-wrap:wrap; min-width:0; }
+html .account-actions { justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+html .account-avatar { width:34px; height:34px; overflow:hidden; flex-shrink:0; }
+html .account-avatar img { display:block; width:100%; height:100%; object-fit:cover; }
+html .account-actions :is(a,button) { min-height:44px; display:inline-flex; align-items:center; padding:8px; white-space:nowrap; }
+html .admin-shell .admin-account { justify-content:flex-end; gap:8px; }
+html .admin-account > a { display:inline-flex; align-items:center; min-height:44px; padding:8px; }
+.portal-hero > *, .app .intro > *, .booking-card > *, .admin-heading > * { min-width:0; }
+html :is(.card-title,.card-kicker,.booking-card h2,.owner-line,.login-notice,.admin-heading p,.blocked-dates) { overflow-wrap:anywhere; }
+html .action-row { flex-wrap:wrap; }
+html .login-providers { width:100%; grid-template-columns:minmax(0,1fr); }
+html .login-card .provider-button { padding:12px; white-space:normal; }
+html .login-security { align-items:flex-start; text-align:left; }
+html .login-security svg { flex-shrink:0; margin-top:2px; }
+html :is(.detail-dialog,.admin-dialog) { max-height:calc(100dvh - 32px); overscroll-behavior:contain; overflow:auto; }
+html [data-slot=dialog-close] { width:44px; height:44px; display:grid; place-items:center; background:var(--card); color:var(--foreground); opacity:1; border:1px solid var(--border); z-index:5; }
+/* The close control shares the photo row and stays available while scrolling. */
+html .detail-dialog > .detail-photo { grid-column:1; grid-row:1; min-width:0; }
+html .detail-dialog > .detail-content { grid-column:2; grid-row:1; min-width:0; }
+html .detail-dialog > [data-slot=dialog-close] { position:sticky; top:8px; right:auto; grid-column:1 / -1; grid-row:1; align-self:start; justify-self:end; margin:8px 8px 0 0; }
+html .admin-dialog { padding-top:64px; }
+html .admin-dialog textarea { width:100%; min-width:0; font-size:16px; }
+html .admin-dialog-actions { flex-wrap:wrap; }
+html .admin-table-wrap { max-width:100%; overscroll-behavior-x:contain; }
+html .admin-main,.admin-section { min-width:0; }
+
+@media (min-width:801px) and (max-width:1100px) {
+  html .app .header { flex-wrap:wrap; gap:16px; }
+  html .app .main-nav { order:3; width:100%; justify-content:center; }
+  html .app .header-account { margin-left:auto; }
+}
+@media (max-width:800px) {
+  html .app { padding-bottom:calc(88px + env(safe-area-inset-bottom)); }
+  html body { padding-bottom:0; }
+  html .app .header { flex-wrap:wrap; gap:14px; }
+  html .app .header-account { margin-left:auto; }
+  html .app .main-nav {
+    position:fixed; bottom:0; left:0; right:0; z-index:35;
+    width:100%!important; justify-content:space-around!important; gap:0!important;
+    padding:7px 8px calc(8px + env(safe-area-inset-bottom))!important;
+    border-top:1px solid var(--border); background:var(--card)!important;
+  }
+  html .app .main-nav button { flex:1; min-width:0; flex-direction:column; min-height:53px; padding:5px 1px; gap:3px; font-size:12px; }
+  html .app .main-nav button svg { display:block; width:21px!important; height:21px!important; }
+  html body:has(.app) .back-top { bottom:calc(90px + env(safe-area-inset-bottom)); }
+  html .filters { flex-wrap:wrap; }
+  html .filters .choice { min-width:0; flex:1 1 110px; max-width:100%; }
+}
+@media (max-width:650px) {
+  html .portal-nav,html .app .header,html .admin-header {
+    display:flex; flex-direction:row; flex-wrap:wrap; align-items:center;
+    height:auto; min-height:0; padding:16px; gap:14px;
+  }
+  html .portal-nav > .portal-brand,html .app .header > .brand,html .admin-header > .brand { flex-basis:100%; min-width:0; }
+  html .portal-nav nav,html .app .header-account,html .admin-header .admin-account {
+    width:100%; margin-left:auto; justify-content:flex-end; gap:8px;
+  }
+  html .portal-nav .portal-brand { font-size:15px; }
+  html .app .header-account .account-actions { flex-basis:100%; }
+  html .portal-nav .about-link { display:none; }
+  html .login-page { padding:20px 16px 40px; }
+  html .login-topbar { display:flex; flex-direction:column; align-items:flex-end; gap:14px; }
+  html .login-topbar .back { align-self:flex-start; min-height:44px; }
+  html .login-card { padding:28px 20px; margin-top:24px; width:100%; }
+  html .login-card h1 { font-size:clamp(25px,7vw,29px); }
+  html .login-card p { font-size:14px; }
+  html .app .main-wrap { padding:0 16px; }
+  html .app :is(.form-row,.measurement-grid) { grid-template-columns:minmax(0,1fr); }
+  html .app .section-heading { flex-wrap:wrap; }
+  html .app .section-heading > div { flex:1 1 150px; }
+  html .app .section-heading .choice { max-width:100%; white-space:normal; }
+  html .app .search-box { padding-left:4px; gap:8px; }
+  html .app .search-box svg { flex-shrink:0; }
+  html .app .choice { white-space:normal; height:auto!important; min-height:44px; }
+  html .app .upload-thumbnails { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  html .app .upload-drop { padding:20px; text-align:center; }
+  html .app .booking-actions { width:100%; }
+  html .app .booking-card { flex-wrap:nowrap; }
+  html .app .booking-next { flex-basis:auto; width:100%; }
+  html .app .action-row { width:100%; }
+  html .app .action-row > button { flex:1; white-space:normal; }
+  html .portal-page .hero-copy h1 { white-space:normal; }
+  html .portal-page .hero-actions { flex-direction:column; align-items:center; }
+  html .portal-page .showcase-controls { flex-wrap:wrap; gap:8px; }
+  html .portal-page .showcase-controls button { min-height:44px; min-width:44px; }
+  html .portal-page .showcase-controls small { flex-basis:100%; text-align:center; }
+  html .portal-page .showcase-label { flex-wrap:wrap; gap:8px; }
+  html .portal-page .portal-footer { flex-direction:column; align-items:flex-start; }
+  html .detail-dialog { grid-template-columns:minmax(0,1fr); max-width:calc(100% - 24px)!important; }
+  html .detail-dialog > .detail-content { grid-column:1; grid-row:2; padding:24px 16px; }
+  html .detail-dialog .form-row { grid-template-columns:minmax(0,1fr); }
+  html .detail-dialog .detail-tools { gap:8px; }
+  html .detail-dialog .detail-tools button { flex:1 1 110px; }
+  html .detail-dialog .cost-summary { gap:8px; }
+  html .admin-header .admin-account .preferences-controls { flex-basis:100%; }
+  html .admin-heading { flex-wrap:wrap; }
+  html .admin-pagination { flex-wrap:wrap; gap:8px; padding:14px; }
+  html .admin-search { flex-wrap:wrap; }
+  html .admin-search input { flex:1 1 150px; font-size:16px; }
+  html .admin-dialog { max-width:calc(100% - 24px); padding-inline:16px; }
+}

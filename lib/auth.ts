@@ -1,6 +1,7 @@
 import {env} from '@/lib/runtime-env';
 import {headers} from 'next/headers';
 import {database} from '@/db/raw';
+import {googleProfilePicture} from './profile-picture';
 
 
 export const SESSION_COOKIE='cos_session';
@@ -21,8 +22,8 @@ export function tokenCookie(name:string,value:string,age:number,origin:string){r
 export async function getAppUser(){
  const h=await headers();const token=readCookie(h.get('cookie'),SESSION_COOKIE);
  if(/^[A-Za-z0-9_-]{43}$/.test(token)){
-  const user=await database().prepare('SELECT u.id,u.email,u.name FROM sessions s JOIN users u ON u.id=s.userId WHERE s.hash=? AND s.expires>?').bind(await digest(token),Date.now()).first<{id:string;email:string;name:string}>();
-  if(user)return {userId:user.id,email:user.email,fullName:user.name,displayName:user.name};
+  const user=await database().prepare('SELECT u.id,u.email,u.name,u.picture FROM sessions s JOIN users u ON u.id=s.userId WHERE s.hash=? AND s.expires>?').bind(await digest(token),Date.now()).first<{id:string;email:string;name:string;picture:string|null}>();
+  if(user)return {userId:user.id,email:user.email,fullName:user.name,displayName:user.name,picture:user.id.startsWith('google:')?googleProfilePicture(user.picture):null};
  }
  // The starter test identity is never accepted by a production build.
 

@@ -41,7 +41,7 @@ html[data-theme=light] .hero-orbit.hero-ellipse{border-color:#8860b866}html[data
 
 .portal-about{max-width:1240px;margin:0 auto;padding:64px 5%;border-bottom:1px solid var(--border)}.portal-about h2{font-size:clamp(23px,3vw,35px);font-weight:750;max-width:800px;margin:12px 0 18px;line-height:1.4}.portal-about p{max-width:880px;font-size:15px;line-height:1.95;color:var(--muted-foreground)}@media(max-width:600px){.portal-about{padding:40px 24px}.portal-about p{font-size:14px}}
 
-/* Cards disclose their descriptions on hover, click or keyboard activation. */
+/* Only the selected card reveals its description. */
 .quest-grid { align-items:start; }
 .portal-page .quest-card { padding:0; transition:border-color .2s,background .2s; }
 .portal-page .quest-card h3 { margin:0; }
@@ -51,7 +51,12 @@ html[data-theme=light] .hero-orbit.hero-ellipse{border-color:#8860b866}html[data
 .quest-card-title { display:block; margin-top:28px; font-size:17px; font-weight:650; }
 .quest-chevron { transition:transform .2s; }
 .quest-card[data-open=true] .quest-chevron { transform:rotate(180deg); }
-.quest-card[data-open=true] { border-color:var(--lavender); }
+.portal-page .quest-card[data-open=true] { border-color:var(--lavender); background:#34284d; color:#f7f5ff; }
+.portal-page .quest-card[data-open=true] .quest-card-meta { color:#d9caff; }
+.portal-page .quest-card[data-open=true] .quest-description { color:#e6ddf2; }
+html[data-theme=light] .portal-page .quest-card[data-open=true] { background:#e8dcfa; color:#34204b; border-color:#8860b8; }
+html[data-theme=light] .portal-page .quest-card[data-open=true] .quest-card-meta { color:#674193; }
+html[data-theme=light] .portal-page .quest-card[data-open=true] .quest-description { color:#523f65; }
 .portal-page .quest-card .quest-description { padding:0 22px 25px; margin:0; }
 .quest-description[hidden] { display:none; }
 @media(max-width:650px) { .quest-toggle { padding:22px; } .quest-card-title { margin-top:17px; } .quest-card-meta > span { font-size:10px; } }

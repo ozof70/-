@@ -43,18 +43,19 @@ html[data-theme=light] .hero-orbit.hero-ellipse{border-color:#8860b866}html[data
 
 /* Only the selected card reveals its description. */
 .quest-grid { align-items:start; }
-.portal-page .quest-card { padding:0; transition:border-color .2s,background .2s; }
+.portal-page .quest-card { padding:0; transition:border-color .2s,background .2s,box-shadow .2s; }
 .portal-page .quest-card h3 { margin:0; }
 .quest-toggle { display:block; width:100%; padding:25px 22px; text-align:left; background:transparent; color:inherit; border:0; border-radius:3px; }
 .quest-card-meta { display:flex; align-items:center; gap:8px; color:var(--lavender); }
 .quest-card-meta > span { margin-left:auto; font:9px monospace; letter-spacing:.08em; }
 .quest-card-title { display:block; margin-top:28px; font-size:17px; font-weight:650; }
-.portal-page .quest-card[data-open=true] { border-color:var(--lavender); background:#34284d; color:#f7f5ff; }
-.portal-page .quest-card[data-open=true] .quest-card-meta { color:#d9caff; }
-.portal-page .quest-card[data-open=true] .quest-description { color:#e6ddf2; }
-html[data-theme=light] .portal-page .quest-card[data-open=true] { background:#e8dcfa; color:#34204b; border-color:#8860b8; }
-html[data-theme=light] .portal-page .quest-card[data-open=true] .quest-card-meta { color:#674193; }
-html[data-theme=light] .portal-page .quest-card[data-open=true] .quest-description { color:#523f65; }
+html[data-theme] .portal-page .quest-card[data-open=true] {
+  background:linear-gradient(135deg,#ffffff 0%,#eee2ff 48%,#b987ed 100%);
+  color:#2c1443; border-color:#b778f0;
+  box-shadow:0 8px 24px #9e60ed30;
+}
+html[data-theme] .portal-page .quest-card[data-open=true] .quest-card-meta { color:#4a206a; }
+html[data-theme] .portal-page .quest-card[data-open=true] .quest-description { color:#342047; }
 .portal-page .quest-card .quest-description { padding:0 22px 25px; margin:0; }
 .quest-description[hidden] { display:none; }
 @media(max-width:650px) { .quest-toggle { padding:22px; } .quest-card-title { margin-top:17px; } .quest-card-meta > span { font-size:10px; } }

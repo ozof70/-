@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
 export const SITE_NAME='COZ COS CLOSET';
-export const SITE_ORIGIN='https://cos-closet-production.up.railway.app';
+export const SITE_ORIGIN='https://closet.cozcos.com';
 export const SITE_DESCRIPTION='COZ COS CLOSET（COZ COS）共用衣櫃，專為 Cosplay 服裝租借與分享打造。探索動漫、遊戲角色服裝，查看多張照片、品牌與尺寸，選擇租期提出申請，也能上架自己的 Cos 服裝出租。';
 export function publicMetadata(title:string,description:string,path:string):Metadata{return {
  title,description,alternates:{canonical:path},

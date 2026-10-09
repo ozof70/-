@@ -6,7 +6,7 @@ const local = new URL(oldOrigin).hostname === '127.0.0.1';
 const headers = local ? {Host: 'cos-closet-production.up.railway.app'} : {};
 for (const path of ['/', '/explore?item=ui-admin-costume&lang=en', '/about', '/login', '/brand-icon.png', '/robots.txt', '/sitemap.xml']) {
   const response = await fetch(oldOrigin + path, {redirect: 'manual', headers});
-  assert.equal(response.status, 308, path);
+  assert.equal(response.status, 301, path);
   assert.equal(new URL(response.headers.get('location')).href, newOrigin + path, path);
 }
 const response = await fetch(oldOrigin + '/api/auth/logout', {method: 'POST', redirect: 'manual', headers});

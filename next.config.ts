@@ -5,10 +5,15 @@ const nextConfig: NextConfig = {
   experimental: {serverActions: {bodySizeLimit: '6mb'}},
   async redirects() {
     return [{
+      source: '/api/:path*',
+      has: [{type: 'host', value: 'cos-closet-production.up.railway.app'}],
+      destination: 'https://closet.cozcos.com/api/:path*',
+      permanent: true,
+    }, {
       source: '/:path*',
       has: [{type: 'host', value: 'cos-closet-production.up.railway.app'}],
       destination: 'https://closet.cozcos.com/:path*',
-      permanent: true,
+      statusCode: 301,
     }];
   },
 };

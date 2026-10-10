@@ -2,7 +2,7 @@ import {database} from '@/db/raw';
 import type {Item} from '@/lib/catalog';
 import {parseDetails,parsePhotos} from '@/lib/listing-details';
 import {publicMetadata} from '@/lib/seo';
-export const metadata=publicMetadata('探索 Cosplay 服裝租借｜COZ COS CLOSET','探索 COZ COS CLOSET 共用衣櫃，尋找動漫與遊戲 Cosplay 服裝。依角色、尺寸及地區挑選服裝，查看照片、品牌與租金，選擇租期向衣主提出申請。','/explore');
+export const metadata=publicMetadata('探索 Cosplay 服裝租借｜COz Cos Closet','探索 COz Cos Closet 共用衣櫃，尋找動漫與遊戲 Cosplay 服裝。依角色、尺寸及地區挑選服裝，查看照片、品牌與租金，選擇租期向衣主提出申請。','/explore');
 import Closet from '../closet';
 export const dynamic='force-dynamic';
 export default async function Explore(){

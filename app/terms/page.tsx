@@ -5,6 +5,6 @@ import LegalContent from '../legal-content';
 export async function generateMetadata(){
  const locale=(await cookies()).get('cos_language')?.value==='en'?'en':'zh';
  const doc=legalDocuments.terms;
- return publicMetadata(doc.title[locale]+'｜COZ COS CLOSET',doc.description[locale],'/terms');
+ return publicMetadata(doc.title[locale]+'｜COz Cos Closet',doc.description[locale],'/terms');
 }
 export default function TermsPage(){return <LegalContent kind="terms"/>}

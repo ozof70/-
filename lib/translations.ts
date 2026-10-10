@@ -2,12 +2,12 @@ export const english:Record<string,string> = {
   "法律資訊": "Legal information",
   "服務條款": "Terms of Service",
   "隱私權政策": "Privacy Policy",
- "COZ COS 是 COZ COS CLOSET 的品牌簡稱，提供 Cosplay 服裝租借、衣櫃分享與上架申請服務。":"COZ COS is the short brand name for COZ COS CLOSET, a platform for cosplay outfit rentals, wardrobe sharing and listing requests.",
+ "COz Cos 是 COz Cos Closet 的品牌簡稱，提供 Cosplay 服裝租借、衣櫃分享與上架申請服務。":"COz Cos is the short brand name for COz Cos Closet, a platform for cosplay outfit rentals, wardrobe sharing and listing requests.",
  "服務介紹與常見問題":"About the service and FAQ",
 
   "管理後台": "Administration",
   "Cosplay 服裝租借，讓衣櫃裡的熱愛再次登場。": "Cosplay rentals. Let your wardrobe take the stage again.",
-  "COZ COS CLOSET 是以 Cosplay 服裝租借與分享為主的共用衣櫃平台。無論是動漫、遊戲角色或原創服裝，都能查看照片、服裝品牌與尺寸資訊，依地區和租期尋找合適的裝備；出租者也能上架自己的 Cos 服裝，讓更多同好延續角色的故事。": "COZ COS CLOSET is a shared wardrobe for renting and sharing cosplay outfits. Explore anime, game and original costumes, check photos, brands and sizing, and find an outfit by location and rental dates. Owners can also list their cosplay outfits so another fan can continue the story.",
+  "COz Cos Closet 是以 Cosplay 服裝租借與分享為主的共用衣櫃平台。無論是動漫、遊戲角色或原創服裝，都能查看照片、服裝品牌與尺寸資訊，依地區和租期尋找合適的裝備；出租者也能上架自己的 Cos 服裝，讓更多同好延續角色的故事。": "COz Cos Closet is a shared wardrobe for renting and sharing cosplay outfits. Explore anime, game and original costumes, check photos, brands and sizing, and find an outfit by location and rental dates. Owners can also list their cosplay outfits so another fan can continue the story.",
 
 "準備中":"Coming soon",
 "使用 LINE 登入":"Log in with LINE",
@@ -259,7 +259,7 @@ export const english:Record<string,string> = {
   "未能完成登入，請再試一次。": "Unable to sign in. Please try again. ",
   "登入服務暫時無法使用，請稍後重試。": "Sign-in is temporarily unavailable. Please try again later. ",
   "返回探索衣櫃": "Back to explore",
-  "COZ COS CLOSET / 共用衣櫃": "COZ COS CLOSET / Shared wardrobe",
+  "COz Cos Closet / 共用衣櫃": "COz Cos Closet / Shared wardrobe",
   "每個角色，": "Every character. ",
   "都有你的故事。": "Your own story. ",
   "登入後，分享你的服裝，": "Sign in to share your outfits",

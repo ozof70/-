@@ -7,10 +7,10 @@ export const LEGAL_CONTACT = 'dennis02101014@gmail.com';
 export const legalDocuments:Record<LegalKind,LegalDocument> = {
  terms:{
   title:{zh:'服務條款',en:'Terms of Service'},
-  description:{zh:'了解 COZ COS CLOSET 的帳號、服裝上架、租借申請、付款交付與使用規範。',en:'Understand accounts, outfit listings, rental requests, payment arrangements and use of COZ COS CLOSET.'},
+  description:{zh:'了解 COz Cos Closet 的帳號、服裝上架、租借申請、付款交付與使用規範。',en:'Understand accounts, outfit listings, rental requests, payment arrangements and use of COz Cos Closet.'},
   sections:[
    {id:'service',title:{zh:'平台與服務範圍',en:'The platform and its services'},paragraphs:[
-    {zh:'COZ COS CLOSET（簡稱 COZ COS）由 COZ COS CLOSET 團隊營運，提供 Cosplay 服裝展示、衣櫃分享、上架與租借申請管理。平台協助衣主與租借者整理資訊及申請，不是服裝所有人，也不代替雙方確認服裝適合度或履行個別租借約定。',en:'COZ COS CLOSET (COZ COS) is operated by the COZ COS CLOSET team. It provides cosplay outfit discovery, wardrobe sharing, listings and rental request management. The platform helps owners and renters organize information and requests; it does not own the outfits or confirm their suitability or perform individual rental arrangements on either party’s behalf.'},
+    {zh:'COz Cos Closet（簡稱 COz Cos）由 COz Cos Closet 團隊營運，提供 Cosplay 服裝展示、衣櫃分享、上架與租借申請管理。平台協助衣主與租借者整理資訊及申請，不是服裝所有人，也不代替雙方確認服裝適合度或履行個別租借約定。',en:'COz Cos Closet (COz Cos) is operated by the COz Cos Closet team. It provides cosplay outfit discovery, wardrobe sharing, listings and rental request management. The platform helps owners and renters organize information and requests; it does not own the outfits or confirm their suitability or perform individual rental arrangements on either party’s behalf.'},
     {zh:'目前平台不提供線上收款、代收押金、履約保管或物流商自動建單。示範服裝僅供展示，不開放租借。Facebook 或 Instagram 連結是衣主自行提供的參考資訊，不代表平台已驗證身分或保證交易安全。',en:'The platform currently does not process online payments, hold deposits, provide escrow or create courier orders automatically. Demo outfits are for display and cannot be rented. Facebook and Instagram links are supplied by owners for reference; they do not establish platform-verified identity or a guarantee of transaction safety.'}
    ]},
    {id:'accounts',title:{zh:'帳號與安全',en:'Accounts and security'},paragraphs:[
@@ -48,10 +48,10 @@ export const legalDocuments:Record<LegalKind,LegalDocument> = {
  },
  privacy:{
   title:{zh:'隱私權政策',en:'Privacy Policy'},
-  description:{zh:'了解 COZ COS CLOSET 收集的資料、公開資訊、Cookie、資料保存與個資權利申請方式。',en:'Learn about data collected by COZ COS CLOSET, public information, cookies, retention and personal-data requests.'},
+  description:{zh:'了解 COz Cos Closet 收集的資料、公開資訊、Cookie、資料保存與個資權利申請方式。',en:'Learn about data collected by COz Cos Closet, public information, cookies, retention and personal-data requests.'},
   sections:[
    {id:'operator',title:{zh:'營運者與政策範圍',en:'Operator and policy scope'},paragraphs:[
-    {zh:'COZ COS CLOSET 團隊營運 closet.cozcos.com。本政策說明使用網站探索、登入、上架及租借申請時，我們如何處理個人資料。隱私問題與權利申請可寄至下方聯絡信箱。外部社群、登入服務及物流或付款對象另依各自政策處理資料。',en:'The COZ COS CLOSET team operates closet.cozcos.com. This policy describes how we process personal data when you browse, sign in, list outfits or make rental requests. Contact the email address below about privacy or personal-data rights. External social networks, sign-in providers and shipping or payment counterparties process data under their own policies.'}
+    {zh:'COz Cos Closet 團隊營運 closet.cozcos.com。本政策說明使用網站探索、登入、上架及租借申請時，我們如何處理個人資料。隱私問題與權利申請可寄至下方聯絡信箱。外部社群、登入服務及物流或付款對象另依各自政策處理資料。',en:'The COz Cos Closet team operates closet.cozcos.com. This policy describes how we process personal data when you browse, sign in, list outfits or make rental requests. Contact the email address below about privacy or personal-data rights. External social networks, sign-in providers and shipping or payment counterparties process data under their own policies.'}
    ]},
    {id:'collected',title:{zh:'收集哪些資料、用於什麼目的',en:'What we collect and why'},paragraphs:[
     {zh:'登入：從已啟用的第三方登入服務取得帳號識別、姓名、Email，以及該服務提供且本網站使用的頭貼資料，用來建立帳號、顯示帳號資訊、維持登入與辨識操作權限。我們不取得你的 Google、Apple 或 LINE 密碼；準備中的登入選項尚未提供服務。',en:'Sign-in: enabled third-party sign-in providers supply an account identifier, name, email and, where supported and used by this website, profile picture information. We use these to create your account, display account information, maintain sessions and authorize actions. We do not receive your Google, Apple or LINE password. Sign-in options marked as coming soon are not yet active.'},

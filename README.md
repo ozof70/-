@@ -1,4 +1,4 @@
-# COZ COS CLOSET｜共用衣櫃
+# COz Cos Closet｜共用衣櫃
 
 手機優先、繁體中文的 Cos 服裝租借網站。正式部署目標為 Railway。
 

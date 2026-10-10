@@ -1,4 +1,4 @@
-# COZ COS CLOSET 管理後台
+# COz Cos Closet 管理後台
 
 後台網址：`https://cos-closet-production.up.railway.app/admin`
 

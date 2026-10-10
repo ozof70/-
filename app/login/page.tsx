@@ -1,4 +1,4 @@
-export const metadata={title:'登入｜COZ COS CLOSET',robots:{index:false,follow:false},alternates:{canonical:null}};
+export const metadata={title:'登入｜COz Cos Closet',robots:{index:false,follow:false},alternates:{canonical:null}};
 import {lineConfig} from '@/lib/line-auth';
 import LoginView from './login-view';
 import {Shirt,ArrowLeft,ShieldCheck} from 'lucide-react';

@@ -1,7 +1,7 @@
 # LINE 登入設定
 
 1. 在 https://developers.line.biz/console/ 建立 Provider，再建立 **LINE Login** Channel，App types 選 **Web app**。
-2. Channel 名稱填 COZ COS CLOSET，補上自己的聯絡 Email、網站介紹與隱私政策。
+2. Channel 名稱填 COz Cos Closet，補上自己的聯絡 Email、網站介紹與隱私政策。
 3. LINE Login 頁籤的 Callback URL 填：
    https://cos-closet-production.up.railway.app/api/auth/line/callback
 4. Basic settings 申請 **Email address permission**。網站使用姓名與 Email 建立帳號、提供租借聯絡方式；請依 LINE 要求提供告知畫面截圖。尚未核准時不要啟用正式登入。

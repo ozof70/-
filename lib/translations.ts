@@ -1,4 +1,7 @@
 export const english:Record<string,string> = {
+  "法律資訊": "Legal information",
+  "服務條款": "Terms of Service",
+  "隱私權政策": "Privacy Policy",
  "COZ COS 是 COZ COS CLOSET 的品牌簡稱，提供 Cosplay 服裝租借、衣櫃分享與上架申請服務。":"COZ COS is the short brand name for COZ COS CLOSET, a platform for cosplay outfit rentals, wardrobe sharing and listing requests.",
  "服務介紹與常見問題":"About the service and FAQ",
 
@@ -25,7 +28,6 @@ export const english:Record<string,string> = {
   "把下一場故事穿在身上。": "Wear your next story. ",
   "開始租借": "Start renting",
   "分享我的衣櫃": "Share my wardrobe",
-  "衣服共享 · 熱愛不設限": "Shared outfits. Limitless passion. ",
   "出角準備，": "Your next cosplay",
   "從這裡開始。": "starts here. ",
   "從心動的服裝，到真實的相遇。": "From the outfit you love to real connections. ",
@@ -101,7 +103,6 @@ export const english:Record<string,string> = {
   "地區": "Location",
   "重設": "Reset",
   "我的收藏": "Favorites",
-  "收藏保存在此瀏覽器，不會跨裝置同步。": "Saved in this browser only. Not synced across devices. ",
   "我的心動清單": "My favorites",
   "發現你的下一套": "Find your next outfit",
   "套服裝": " outfits",

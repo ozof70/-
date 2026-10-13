@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {mkdtempSync,mkdirSync,readFileSync,readdirSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import ts from '../node_modules/typescript/lib/typescript.js';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url),z=require('zod').z;
+process.env.ADMIN_GOOGLE_EMAILS='dennis02101014@gmail.com';
+const root=mkdtempSync(path.join(tmpdir(),'closet-drafts-')),batchDir=path.join(root,'batch');mkdirSync(path.join(batchDir,'photos'),{recursive:true});
+const db=new DatabaseSync(path.join(root,'cos-closet.sqlite'));db.exec('PRAGMA foreign_keys=ON');for(const name of readdirSync('drizzle').filter(n=>n.endsWith('.sql')).sort())db.exec(readFileSync('drizzle/'+name,'utf8'));
+db.prepare('INSERT INTO users(id,email,name,created) VALUES(?,?,?,?)').run('google:dennis','dennis02101014@gmail.com','Dennis',1);
+const photo=Buffer.from([255,216,255,217]),photoName='test-photo-0000000000.jpg';writeFileSync(path.join(batchDir,'photos',photoName),photo);
+const batch={id:'test-batch',ownerEmail:'dennis02101014@gmail.com',items:[{source:'drive-folder',title:'Test costume',series:'Test series',photos:[{file:photoName,sha256:createHash('sha256').update(photo).digest('hex')}]}]};writeFileSync(path.join(batchDir,'batch.json'),JSON.stringify(batch));
+const run=()=>spawnSync(process.execPath,['scripts/import-drafts.mjs',batchDir],{env:{...process.env,DATA_DIR:root},encoding:'utf8'});
+class Statement{constructor(sql,values=[]){this.sql=sql;this.values=values}bind(...values){return new Statement(this.sql,values)}async first(){return db.prepare(this.sql).get(...this.values)}async all(){return {results:db.prepare(this.sql).all(...this.values)}}runSync(){return db.prepare(this.sql).run(...this.values)}async run(){return {meta:{changes:Number(this.runSync().changes)}}}}
+let user=null;const database=()=>({prepare:sql=>new Statement(sql),async batch(list){db.exec('BEGIN');try{const result=list.map(s=>s.runSync());db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}}});
+const compile=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
+const source=file=>readFileSync(file,'utf8').replace(/^import .*;\r?\n/gm,'');
+globalThis.draftTest={z,database,getAppUser:async()=>user,getChatGPTUser:async()=>user,trustedOrigin:()=> 'https://example.com',env:{BUCKET:{get:async()=>({body:photo,httpMetadata:{contentType:'image/jpeg'}})}}};
+try{
+ assert.equal(run().status,0);const item=db.prepare('SELECT * FROM items').get();assert.equal(item.owner,'google:dennis');assert.equal(item.active,0);assert.equal(item.price,0);assert.equal(item.size,'');assert.equal(JSON.parse(item.details).draft,true);assert.equal(JSON.parse(item.photos).length,1);assert.equal(db.prepare('SELECT COUNT(*) n FROM admin_audit').get().n,1);
+ db.prepare('UPDATE items SET title=? WHERE id=?').run('Owner edited title',item.id);assert.equal(run().status,0);assert.equal(db.prepare('SELECT COUNT(*) n FROM items').get().n,1);assert.equal(db.prepare('SELECT title FROM items').get().title,'Owner edited title');
+ const draftHelpers=await import(compile('const {z}=globalThis.draftTest;\n'+source('lib/drafts.ts')));Object.assign(globalThis.draftTest,draftHelpers);
+ const detailHelpers=await import(compile('const {z}=globalThis.draftTest;\n'+source('lib/listing-details.ts')));Object.assign(globalThis.draftTest,detailHelpers);
+ const auth=await import(compile('const {getAppUser}=globalThis.draftTest;\n'+source('lib/admin-auth.ts')));Object.assign(globalThis.draftTest,auth);
+ const photoRoute=await import(compile('const {env,database,getAppUser,isAdmin,isDraft}=globalThis.draftTest;\n'+source('app/api/photos/[id]/route.ts')));
+ const photoId=JSON.parse(item.photos)[0].split('/').pop();const readPhoto=()=>photoRoute.GET(new Request('https://example.com/api/photos/'+photoId),{params:Promise.resolve({id:photoId})});
+ assert.equal((await readPhoto()).status,404);user={userId:'google:other',email:'other@example.com'};assert.equal((await readPhoto()).status,404);user={userId:'google:dennis',email:batch.ownerEmail};assert.equal((await readPhoto()).status,200);
+ const closetRoute=await import(compile('const {isAdmin,getChatGPTUser,database,env,trustedOrigin,listingDetailsSchema,parseDetails,parsePhotos,isDraft,rentalListingSchema}=globalThis.draftTest;\n'+source('app/api/closet/route.ts')));
+ const post=(body,origin='https://example.com')=>closetRoute.POST(new Request('https://example.com/api/closet',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)}));
+ assert.equal((await post({action:'availability',item:item.id,active:true})).status,409);
+ const adminRoute=await import(compile('const {getAppUser,isAdmin,database,trustedOrigin,z,isDraft}=globalThis.draftTest;\n'+source('app/api/admin/route.ts')));
+ assert.equal((await adminRoute.POST(new Request('https://example.com/api/admin',{method:'POST',headers:{origin:'https://example.com','content-type':'application/json'},body:JSON.stringify({action:'moderate',id:item.id,active:true,expectedActive:0,reason:'Test publish'})}))).status,400);
+ const fields={title:'Completed costume',series:'Test series',ownerName:'Dennis',size:'M',city:'台北市',price:300,deposit:1000,description:'Verified costume description.',delivery:'面交'};
+ assert.equal((await post({action:'completeDraft',id:item.id,fields},'https://evil.example')).status,403);
+ user={userId:'google:other',email:'other@example.com'};assert.equal((await post({action:'completeDraft',id:item.id,fields})).status,409);
+ user={userId:'google:dennis',email:batch.ownerEmail};assert.equal((await post({action:'completeDraft',id:item.id,fields:{...fields,price:0}})).status,400);assert.equal((await post({action:'completeDraft',id:item.id,fields})).status,200);assert.equal(db.prepare('SELECT active FROM items').get().active,0);
+ user=null;assert.equal((await readPhoto()).status,404);assert.equal((await (await closetRoute.GET(new Request('https://example.com/api/closet'))).json()).items.length,0);
+ user={userId:'google:dennis',email:batch.ownerEmail};assert.equal((await post({action:'availability',item:item.id,active:true})).status,200);
+ user=null;const publicItems=await (await closetRoute.GET(new Request('https://example.com/api/closet'))).json();assert.equal(publicItems.items.length,1);assert.equal((await readPhoto()).status,200);
+ console.log('PASS: private import, existing owner, restart idempotence, private photos, draft publish guards, owner-only completion, CSRF, validation and explicit publication.');
+}finally{db.close();delete globalThis.draftTest;assert.equal(path.dirname(path.resolve(root)),path.resolve(tmpdir()));rmSync(root,{recursive:true,force:true})}

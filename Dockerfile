@@ -14,5 +14,7 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/scripts/migrate.mjs ./scripts/migrate.mjs
+COPY --from=builder /app/scripts/import-drafts.mjs ./scripts/import-drafts.mjs
+COPY --from=builder /app/import-batches ./import-batches
 EXPOSE 3000
-CMD ["sh", "-c", "node scripts/migrate.mjs && node server.js"]
+CMD ["sh", "-c", "node scripts/migrate.mjs && node scripts/import-drafts.mjs && node server.js"]

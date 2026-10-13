@@ -6,6 +6,7 @@ function socialLink(hosts:string[]){return z.string().trim().max(300).default(''
 },'請填入完整的 HTTPS Facebook 或 Instagram 個人頁連結。')}
 const measurement=(min:number,max:number)=>z.preprocess(v=>v===''||v==null?undefined:v,z.coerce.number().finite().min(min).max(max).optional());
 export const listingDetailsSchema=z.object({
+ draft:z.boolean().default(false),
  brand:z.string().trim().max(80).default(''),
  facebook:socialLink(['facebook.com','www.facebook.com','m.facebook.com']),
  instagram:socialLink(['instagram.com','www.instagram.com']),

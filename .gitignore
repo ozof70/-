@@ -49,3 +49,8 @@ next-env.d.ts
 !/.env.example
 
 /.data/
+
+# Private, one-time deployment imports are never committed.
+/import-batches/*
+!/import-batches/.gitkeep
+/imports/

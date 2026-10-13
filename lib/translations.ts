@@ -1,4 +1,9 @@
 export const english:Record<string,string> = {
+ "草稿・待補資料":"Draft · details needed",
+ "尺寸待確認":"Size pending",
+ "私人草稿，未公開":"Private draft",
+ "租借設定待確認":"Rental details pending",
+ "補齊草稿資料":"Complete draft details",
   "法律資訊": "Legal information",
   "服務條款": "Terms of Service",
   "隱私權政策": "Privacy Policy",

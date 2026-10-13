@@ -3,6 +3,7 @@ import {isAdmin} from '@/lib/admin-auth';
 import {database} from '@/db/raw';
 import {trustedOrigin} from '@/lib/runtime-env';
 import {z} from 'zod';
+import {isDraft} from '@/lib/drafts';
 export const dynamic='force-dynamic';
 const response=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 export async function GET(req:Request){
@@ -37,6 +38,7 @@ export async function POST(req:Request){
   const parsed=mutation.safeParse(input);if(!parsed.success)return response({error:'請填寫有效操作與至少兩字的原因'},400);
   const v=parsed.data,db=database(),now=Date.now(),audit=crypto.randomUUID();let changed:number;
   if(v.action==='moderate'){
+   if(v.active){const item=await db.prepare('SELECT details,price,city,size,delivery FROM items WHERE id=?').bind(v.id).first<{details:string;price:number;city:string;size:string;delivery:string}>();if(item&&(isDraft(item.details)||item.price<1||!item.city||!item.size||!item.delivery))return response({error:'草稿尚未補齊租借資料，不能公開'},400)}
    const statements=[db.prepare('INSERT INTO admin_audit(id,actor,action,target,reason,created) SELECT ?,?,?,?,?,? FROM items WHERE id=? AND active=?').bind(audit,user.userId,v.active?'restore_item':'hide_item',v.id,v.reason,now,v.id,v.expectedActive)];
    if(v.active)statements.push(db.prepare('DELETE FROM item_moderation WHERE item=? AND EXISTS(SELECT 1 FROM items WHERE id=? AND active=?)').bind(v.id,v.id,v.expectedActive));
    else statements.push(db.prepare('INSERT INTO item_moderation(item,reason,actor,updated) SELECT ?,?,?,? FROM items WHERE id=? AND active=? ON CONFLICT(item) DO UPDATE SET reason=excluded.reason,actor=excluded.actor,updated=excluded.updated').bind(v.id,v.reason,user.userId,now,v.id,v.expectedActive));

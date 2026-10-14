@@ -1,3 +1,4 @@
+import {rentalTotal} from '@/lib/pricing';
 import {isAdmin} from '@/lib/admin-auth';
 import {getAppUser as getChatGPTUser} from '@/lib/auth';
 import {database} from '@/db/raw';
@@ -15,7 +16,7 @@ export async function POST(req:Request){try{
  const user=await getChatGPTUser();if(!user)return fail('請先登入再繼續。',401);const db=database();
  if(req.headers.get('content-type')?.includes('multipart/form-data')){
   if(Number(req.headers.get('content-length')??0)>21*1024*1024)return fail('照片合計上限為 20 MB',413);
-  const form=await req.formData();const fields=Object.fromEntries(form);const result=input.safeParse(fields);if(!result.success)return fail('請確認服裝資料完整，租金與押金須為有效整數。');
+  const form=await req.formData();const fields={...Object.fromEntries(form),ownerName:(user.fullName??'衣主').slice(0,30),city:'新北市'};const result=input.safeParse(fields);if(!result.success)return fail('請確認服裝資料完整，租金與押金須為有效整數。');
   const details=listingDetailsSchema.safeParse(fields);if(!details.success)return fail('請確認社群網址使用正確平台的 HTTPS 個人頁，身形數值也須在合理範圍內。');
   const photos=form.getAll('photo');
   if(photos.length<1||photos.length>6)return fail('請上傳 1 至 6 張服裝照片。');
@@ -35,7 +36,7 @@ export async function POST(req:Request){try{
  if(b.action==='completeDraft'){
   if(origin!==trustedOrigin(req))return fail('來源不符',403);
   if(typeof b.id!=='string'||b.id.length>200)return fail('草稿不存在',404);
-  const parsed=input.safeParse(b.fields);if(!parsed.success)return fail('請補齊尺寸、地區、租金、押金與交付方式。');
+  const parsed=input.safeParse({...((b.fields&&typeof b.fields==='object')?b.fields:{}),ownerName:(user.fullName??'衣主').slice(0,30),city:'新北市'});if(!parsed.success)return fail('請補齊尺寸、地區、租金、押金與交付方式。');
   const item=await db.prepare('SELECT details FROM items WHERE id=? AND owner=? AND active=0').bind(b.id,user.userId).first<{details:string}>();
   if(!item||!isDraft(item.details))return fail('草稿不存在或已完成',409);
   const v=parsed.data,details={...JSON.parse(item.details),draft:false};
@@ -46,9 +47,9 @@ export async function POST(req:Request){try{
   if(typeof b.item!=='string'||!validDate(b.start)||!validDate(b.end))return fail('請選擇有效租期。');
   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const days=(Date.parse(b.end)-Date.parse(b.start))/86400000+1;if(b.start<today||days<1||days>30)return fail('租期須從今天起，且介於 1 至 30 天。');
   const item=await db.prepare("SELECT * FROM items WHERE id=? AND active=1 AND price>=1 AND COALESCE(json_extract(details,'$.draft'),0)=0").bind(b.item).first<Item>();if(!item)return fail('服裝已下架或不存在。',404);if(item.owner===user.userId)return fail('不能租借自己的服裝。');
-  const id=crypto.randomUUID();const result=await db.prepare("INSERT INTO bookings (id,item,renter,renterName,start,end,status,total) SELECT ?,?,?,?,?,?,'pending',? WHERE NOT EXISTS (SELECT 1 FROM bookings WHERE item=? AND start<=? AND end>=? AND (status='accepted' OR (renter=? AND status='pending')))").bind(id,item.id,user.userId,user.fullName??'租借者',b.start,b.end,item.price*days,item.id,b.end,b.start,user.userId).run();if(!result.meta.changes)return fail('這段租期已有確認租借，或您已有重疊申請。',409);return Response.json({ok:true});
+  const id=crypto.randomUUID();const result=await db.prepare("INSERT INTO bookings (id,item,renter,renterName,start,end,status,total) SELECT ?,?,?,?,?,?,'pending',? WHERE NOT EXISTS (SELECT 1 FROM bookings WHERE item=? AND start<=? AND end>=? AND (status='accepted' OR (renter=? AND status='pending')))").bind(id,item.id,user.userId,user.fullName??'租借者',b.start,b.end,rentalTotal({...item,details:parseDetails(item.details)},days),item.id,b.end,b.start,user.userId).run();if(!result.meta.changes)return fail('這段租期已有確認租借，或您已有重疊申請。',409);return Response.json({ok:true});
  }
- if(b.action==='availability'&&typeof b.item==='string'&&typeof b.active==='boolean'){const r=await db.prepare("UPDATE items SET active=? WHERE id=? AND owner=? AND (?=0 OR (price>=1 AND trim(city)<>'' AND size IN ('XS','S','M','L','XL','其他') AND delivery IN ('面交','宅配','面交或宅配') AND COALESCE(json_extract(details,'$.draft'),0)=0 AND NOT EXISTS (SELECT 1 FROM item_moderation WHERE item=items.id)))").bind(b.active?1:0,b.item,user.userId,b.active?1:0).run();return r.meta.changes?Response.json({ok:true}):fail('草稿尚未補齊資料，或服裝已由管理員下架。',409)}
+ if(b.action==='availability'&&typeof b.item==='string'&&typeof b.active==='boolean'){const r=await db.prepare("UPDATE items SET active=? WHERE id=? AND owner=? AND (?=0 OR (((price>=1 AND size IN ('XS','S','S/M','M','M/L','L','L/XL','XL','2XL','其他')) OR (price=0 AND json_extract(details,'$.pricePending')=1 AND json_extract(details,'$.partnerWardrobe')=1)) AND trim(city)<>'' AND delivery IN ('面交','宅配','面交或宅配') AND COALESCE(json_extract(details,'$.draft'),0)=0 AND NOT EXISTS (SELECT 1 FROM item_moderation WHERE item=items.id)))").bind(b.active?1:0,b.item,user.userId,b.active?1:0).run();return r.meta.changes?Response.json({ok:true}):fail('草稿尚未補齊資料，或服裝已由管理員下架。',409)}
  if(b.action==='status'&&typeof b.id==='string'&&['accepted','declined','cancelled'].includes(String(b.status))){
   const record=await db.prepare('SELECT b.*,i.owner FROM bookings b JOIN items i ON i.id=b.item WHERE b.id=?').bind(b.id).first<{owner:string;renter:string;status:string;item:string;start:string;end:string}>();if(!record)return fail('找不到申請',404);const cancel=b.status==='cancelled';if(cancel?record.renter!==user.userId:record.owner!==user.userId)return fail('沒有權限',403);if(record.status!=='pending')return fail('此申請已處理',409);
   const r=await db.prepare("UPDATE bookings SET status=? WHERE id=? AND status='pending' AND (?!='accepted' OR NOT EXISTS (SELECT 1 FROM bookings other WHERE other.item=bookings.item AND other.id!=bookings.id AND other.status='accepted' AND other.start<=bookings.end AND other.end>=bookings.start))").bind(b.status,b.id,b.status).run();if(!r.meta.changes)return fail('狀態已變更，或租期與已確認租借重疊。',409);return Response.json({ok:true});

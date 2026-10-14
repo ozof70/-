@@ -7,6 +7,9 @@ function socialLink(hosts:string[]){return z.string().trim().max(300).default(''
 const measurement=(min:number,max:number)=>z.preprocess(v=>v===''||v==null?undefined:v,z.coerce.number().finite().min(min).max(max).optional());
 export const listingDetailsSchema=z.object({
  draft:z.boolean().default(false),
+ pricingMode:z.enum(['daily','rental']).default('daily'),
+ partnerWardrobe:z.boolean().default(false),
+ pricePending:z.boolean().default(false),
  brand:z.string().trim().max(80).default(''),
  facebook:socialLink(['facebook.com','www.facebook.com','m.facebook.com']),
  instagram:socialLink(['instagram.com','www.instagram.com']),

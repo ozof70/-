@@ -1,4 +1,11 @@
 export const english:Record<string,string> = {
+ "每次租借總價（NT$）":"Total per rental (NT$)",
+ "租金待確認":"Price pending",
+ "此款實拍服裝已展示，租金與尺寸仍待衣主確認，暫不接受租借申請。":"This photographed outfit is on display. Rental price and size require owner confirmation; applications are not open yet.",
+ "/ 次":"/ rental",
+ "每次租借總價":"Total per rental",
+ "合作衣櫃":"Partner wardrobe",
+ "此款按次計價，租期最多 30 天並需衣主確認。送出申請不會扣款；運費另議。":"This outfit is priced per rental. Dates up to 30 days require owner confirmation. Applying does not charge you; shipping is arranged separately.",
  "草稿・待補資料":"Draft · details needed",
  "尺寸待確認":"Size pending",
  "私人草稿，未公開":"Private draft",

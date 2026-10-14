@@ -25,11 +25,12 @@ try{
  db.prepare('UPDATE items SET title=? WHERE id=?').run('Owner edited title',item.id);assert.equal(run().status,0);assert.equal(db.prepare('SELECT COUNT(*) n FROM items').get().n,1);assert.equal(db.prepare('SELECT title FROM items').get().title,'Owner edited title');
  const draftHelpers=await import(compile('const {z}=globalThis.draftTest;\n'+source('lib/drafts.ts')));Object.assign(globalThis.draftTest,draftHelpers);
  const detailHelpers=await import(compile('const {z}=globalThis.draftTest;\n'+source('lib/listing-details.ts')));Object.assign(globalThis.draftTest,detailHelpers);
+ const pricingHelpers=await import(compile('const {parseDetails}=globalThis.draftTest;\n'+source('lib/pricing.ts')));Object.assign(globalThis.draftTest,pricingHelpers);
  const auth=await import(compile('const {getAppUser}=globalThis.draftTest;\n'+source('lib/admin-auth.ts')));Object.assign(globalThis.draftTest,auth);
  const photoRoute=await import(compile('const {env,database,getAppUser,isAdmin,isDraft}=globalThis.draftTest;\n'+source('app/api/photos/[id]/route.ts')));
  const photoId=JSON.parse(item.photos)[0].split('/').pop();const readPhoto=()=>photoRoute.GET(new Request('https://example.com/api/photos/'+photoId),{params:Promise.resolve({id:photoId})});
  assert.equal((await readPhoto()).status,404);user={userId:'google:other',email:'other@example.com'};assert.equal((await readPhoto()).status,404);user={userId:'google:dennis',email:batch.ownerEmail};assert.equal((await readPhoto()).status,200);
- const closetRoute=await import(compile('const {isAdmin,getChatGPTUser,database,env,trustedOrigin,listingDetailsSchema,parseDetails,parsePhotos,isDraft,rentalListingSchema}=globalThis.draftTest;\n'+source('app/api/closet/route.ts')));
+ const closetRoute=await import(compile('const {isAdmin,getChatGPTUser,database,env,trustedOrigin,listingDetailsSchema,parseDetails,parsePhotos,isDraft,rentalListingSchema,rentalTotal}=globalThis.draftTest;\n'+source('app/api/closet/route.ts')));
  const post=(body,origin='https://example.com')=>closetRoute.POST(new Request('https://example.com/api/closet',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)}));
  assert.equal((await post({action:'availability',item:item.id,active:true})).status,409);
  const adminRoute=await import(compile('const {getAppUser,isAdmin,database,trustedOrigin,z,isDraft}=globalThis.draftTest;\n'+source('app/api/admin/route.ts')));
@@ -41,5 +42,18 @@ try{
  user=null;assert.equal((await readPhoto()).status,404);assert.equal((await (await closetRoute.GET(new Request('https://example.com/api/closet'))).json()).items.length,0);
  user={userId:'google:dennis',email:batch.ownerEmail};assert.equal((await post({action:'availability',item:item.id,active:true})).status,200);
  user=null;const publicItems=await (await closetRoute.GET(new Request('https://example.com/api/closet'))).json();assert.equal(publicItems.items.length,1);assert.equal((await readPhoto()).status,200);
+ // Exercise the actual booking API across multi-day and flat-price listings.
+ db.prepare('INSERT INTO users(id,email,name,created) VALUES(?,?,?,?)').run('google:renter','renter@example.com','Renter',2);
+ user={userId:'google:renter',email:'renter@example.com',fullName:'Renter'};
+ const start=new Date(Date.now()+86400000*2).toISOString().slice(0,10),end=new Date(Date.now()+86400000*4).toISOString().slice(0,10);
+ assert.equal((await post({action:'book',item:item.id,start,end})).status,200);
+ assert.equal(db.prepare('SELECT total FROM bookings').get().total,900);
+ db.prepare('DELETE FROM bookings').run();
+ db.prepare('UPDATE items SET price=1700,deposit=850,details=? WHERE id=?').run(JSON.stringify({draft:false,pricingMode:'rental',partnerWardrobe:true}),item.id);
+ assert.equal((await post({action:'book',item:item.id,start,end})).status,200);
+ assert.equal(db.prepare('SELECT total FROM bookings').get().total,1700);
+ db.prepare('DELETE FROM bookings').run();
+ db.prepare('UPDATE items SET price=0,details=? WHERE id=?').run(JSON.stringify({draft:false,pricePending:true,partnerWardrobe:true}),item.id);
+ assert.equal((await post({action:'book',item:item.id,start,end})).status,404);
  console.log('PASS: private import, existing owner, restart idempotence, private photos, draft publish guards, owner-only completion, CSRF, validation and explicit publication.');
 }finally{db.close();delete globalThis.draftTest;assert.equal(path.dirname(path.resolve(root)),path.resolve(tmpdir()));rmSync(root,{recursive:true,force:true})}

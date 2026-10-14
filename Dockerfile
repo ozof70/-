@@ -16,6 +16,7 @@ COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/scripts/migrate.mjs ./scripts/migrate.mjs
 COPY --from=builder /app/scripts/import-drafts.mjs ./scripts/import-drafts.mjs
 COPY --from=builder /app/scripts/publish-partner.mjs ./scripts/publish-partner.mjs
+COPY --from=builder /app/scripts/update-partner-photos.mjs ./scripts/update-partner-photos.mjs
 COPY --from=builder /app/import-batches ./import-batches
 EXPOSE 3000
-CMD ["sh", "-c", "node scripts/migrate.mjs && node scripts/import-drafts.mjs && node scripts/publish-partner.mjs && node server.js"]
+CMD ["sh", "-c", "node scripts/migrate.mjs && node scripts/import-drafts.mjs && node scripts/publish-partner.mjs && node scripts/update-partner-photos.mjs && node server.js"]

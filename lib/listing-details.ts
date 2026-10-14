@@ -18,5 +18,5 @@ export const listingDetailsSchema=z.object({
  fitNote:z.string().trim().max(300).default(''),
 });
 export type ListingDetails=z.infer<typeof listingDetailsSchema>;
-export function parseDetails(raw:unknown):Partial<ListingDetails>{try{const result=listingDetailsSchema.safeParse(typeof raw==='string'?JSON.parse(raw):raw);return result.success?result.data:{}}catch{return {}}}
+export function parseDetails(raw:unknown):Partial<ListingDetails>{try{const result=listingDetailsSchema.safeParse(typeof raw==='string'?JSON.parse(raw):raw);if(!result.success)return {};const {brand:_brand,facebook:_facebook,instagram:_instagram,...details}=result.data;return details}catch{return {}}}
 export function parsePhotos(raw:unknown,fallback:string):string[]{try{const photos=typeof raw==='string'?JSON.parse(raw):raw;if(Array.isArray(photos)&&photos.length&&photos.length<=6&&photos.every(p=>typeof p==='string'&&/^\/api\/photos\/[a-f0-9-]{36}$/.test(p)))return photos}catch{}return [fallback]}

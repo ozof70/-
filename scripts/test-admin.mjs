@@ -24,5 +24,23 @@ for(const kind of ['items','bookings','members','audit'])assert.equal((await get
 process.env.ADMIN_GOOGLE_EMAILS='dennis02101014@gmail.com,yixuan9512@gmail.com';
 for(const email of ['dennis02101014@gmail.com','yixuan9512@gmail.com']){assert.equal(isAdmin({userId:'google:test',email}),true);assert.equal(isAdmin({userId:'line:test',email}),false)}
 assert.equal(isAdmin({userId:'google:test',email:'other@example.com'}),false);
+
+db.prepare('INSERT INTO users(id,email,name,created) VALUES(?,?,?,?)').run('google:second-admin','yixuan9512@gmail.com','Second admin',now);
+db.prepare('UPDATE items SET details=? WHERE id=?').run(JSON.stringify({partnerWardrobe:true,pricingMode:'rental'}),'item');
+for(const [id,email] of [['google:admin','dennis02101014@gmail.com'],['google:second-admin','yixuan9512@gmail.com']]){
+ user={userId:id,email};const item=db.prepare('SELECT * FROM items WHERE id=?').get('item');
+ const edit={action:'edit',id:'item',title:'Updated outfit '+id,price:1701,expectedTitle:item.title,expectedPrice:item.price,expectedDeposit:item.deposit,expectedDetails:item.details,reason:'Correct owner price'};
+ assert.equal((await post({...edit,price:0})).status,400);
+ assert.equal((await post({...edit,title:' '})).status,400);
+ assert.equal((await post(edit,'https://evil.example')).status,403);
+ assert.equal((await post(edit)).status,200);
+ assert.equal(db.prepare('SELECT deposit FROM items WHERE id=?').get('item').deposit,850.5);
+ assert.equal((await post(edit)).status,409);
+ assert.equal(db.prepare('SELECT total FROM bookings WHERE id=?').get('booking').total,200);
+ assert.equal(db.prepare('SELECT owner FROM items WHERE id=?').get('item').owner,'google:owner');
+}
+assert.equal(db.prepare("SELECT COUNT(*) n FROM admin_audit WHERE action='edit_item'").get().n,2);
+const log=JSON.parse(db.prepare("SELECT reason FROM admin_audit WHERE action='edit_item' LIMIT 1").get().reason);assert.ok(log.before.title);assert.equal(log.after.price,1701);
+user={userId:'google:owner',email:'owner@example.com'};assert.equal((await post({action:'edit'})).status,403);
 process.env.ADMIN_GOOGLE_EMAILS='';assert.equal(isAdmin(user),false);
 console.log('PASS: admin auth, Google-only identity, CSRF, validation, literal search, moderation, owner relist prevention, restoration, cancellation, optimistic conflicts and audit history.');db.close();delete globalThis.adminTest;

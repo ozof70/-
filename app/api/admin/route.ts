@@ -14,7 +14,7 @@ export async function GET(req:Request){
   const raw=(url.searchParams.get('q')||'').trim().slice(0,100);const q='%'+raw.replace(/[\\%_]/g,'\\$&')+'%';
   const summary=await db.prepare(`SELECT (SELECT COUNT(*) FROM items) AS items,(SELECT COUNT(*) FROM items WHERE active=1) AS active,(SELECT COUNT(*) FROM users) AS members,(SELECT COUNT(*) FROM bookings WHERE status='pending') AS pending,(SELECT COUNT(*) FROM bookings WHERE status='accepted') AS accepted`).first();
   let sql:string;
-  if(kind==='items')sql=`SELECT i.id,i.title,i.series,i.ownerName,i.size,i.city,i.price,i.active,i.created,m.reason AS moderationReason FROM items i LEFT JOIN item_moderation m ON m.item=i.id WHERE i.title LIKE ? ESCAPE '\\' OR i.ownerName LIKE ? ESCAPE '\\' ORDER BY i.created DESC,i.id LIMIT 31 OFFSET ?`;
+  if(kind==='items')sql=`SELECT i.id,i.title,i.series,i.ownerName,i.size,i.city,i.price,i.deposit,i.details,i.active,i.created,m.reason AS moderationReason FROM items i LEFT JOIN item_moderation m ON m.item=i.id WHERE i.title LIKE ? ESCAPE '\\' OR i.ownerName LIKE ? ESCAPE '\\' ORDER BY i.created DESC,i.id LIMIT 31 OFFSET ?`;
   else if(kind==='bookings')sql=`SELECT b.*,i.title,i.ownerName FROM bookings b JOIN items i ON i.id=b.item WHERE i.title LIKE ? ESCAPE '\\' OR b.renterName LIKE ? ESCAPE '\\' ORDER BY b.start DESC,b.id LIMIT 31 OFFSET ?`;
   else if(kind==='members')sql=`SELECT u.id,u.name,u.email,u.created,(SELECT COUNT(*) FROM items i WHERE i.owner=u.id) AS listings,(SELECT COUNT(*) FROM bookings b WHERE b.renter=u.id) AS rentals FROM users u WHERE u.name LIKE ? ESCAPE '\\' OR u.email LIKE ? ESCAPE '\\' ORDER BY u.created DESC,u.id LIMIT 31 OFFSET ?`;
   else if(kind==='audit')sql=`SELECT a.*,u.name AS actorName FROM admin_audit a JOIN users u ON u.id=a.actor WHERE a.target LIKE ? ESCAPE '\\' OR a.reason LIKE ? ESCAPE '\\' ORDER BY a.created DESC,a.id LIMIT 31 OFFSET ?`;
@@ -24,6 +24,7 @@ export async function GET(req:Request){
  }catch{console.error('Admin read failed');return response({error:'後台資料暫時無法載入'},503)}
 }
 const mutation=z.discriminatedUnion('action',[
+ z.object({action:z.literal('edit'),id:z.string().min(1).max(200),title:z.string().trim().min(2).max(80),price:z.number().int().min(1).max(50000),expectedTitle:z.string(),expectedPrice:z.number(),expectedDeposit:z.number(),expectedDetails:z.string(),reason:z.string().trim().min(2).max(300)}),
  z.object({action:z.literal('moderate'),id:z.string().min(1).max(200),active:z.boolean(),expectedActive:z.number().int().min(0).max(1),reason:z.string().trim().min(2).max(300)}),
  z.object({action:z.literal('cancel'),id:z.string().min(1).max(200),expectedStatus:z.enum(['pending','accepted']),reason:z.string().trim().min(2).max(300)})
 ]);
@@ -37,7 +38,18 @@ export async function POST(req:Request){
   let input:unknown;try{input=JSON.parse(text)}catch{return response({error:'JSON 格式不符'},400)}
   const parsed=mutation.safeParse(input);if(!parsed.success)return response({error:'請填寫有效操作與至少兩字的原因'},400);
   const v=parsed.data,db=database(),now=Date.now(),audit=crypto.randomUUID();let changed:number;
-  if(v.action==='moderate'){
+  if(v.action==='edit'){
+   const item=await db.prepare('SELECT title,price,deposit,details FROM items WHERE id=?').bind(v.id).first<{title:string;price:number;deposit:number;details:string}>();
+   if(!item||item.title!==v.expectedTitle||item.price!==v.expectedPrice||item.deposit!==v.expectedDeposit||item.details!==v.expectedDetails)return response({error:'資料已被更新或不存在，請重新整理後再操作'},409);
+   const deposit=JSON.parse(item.details).partnerWardrobe?v.price/2:item.deposit;
+   const record=JSON.stringify({reason:v.reason,before:{title:item.title,price:item.price,deposit:item.deposit},after:{title:v.title,price:v.price,deposit}});
+   const condition='id=? AND title=? AND price=? AND deposit=? AND details=?';
+   const values=[v.id,v.expectedTitle,v.expectedPrice,v.expectedDeposit,v.expectedDetails];
+   const results=await db.batch([
+    db.prepare('INSERT INTO admin_audit(id,actor,action,target,reason,created) SELECT ?,?,?,?,?,? FROM items WHERE '+condition).bind(audit,user.userId,'edit_item',v.id,record,now,...values),
+    db.prepare('UPDATE items SET title=?,price=?,deposit=? WHERE '+condition).bind(v.title,v.price,deposit,...values)
+   ]);changed=Number(results[1].changes);
+  }else if(v.action==='moderate'){
    if(v.active){const item=await db.prepare('SELECT details,price,city,size,delivery FROM items WHERE id=?').bind(v.id).first<{details:string;price:number;city:string;size:string;delivery:string}>();if(item&&(isDraft(item.details)||(!JSON.parse(item.details).pricePending&&(item.price<1||!item.size))||!item.city||!item.delivery))return response({error:'草稿尚未補齊租借資料，不能公開'},400)}
    const statements=[db.prepare('INSERT INTO admin_audit(id,actor,action,target,reason,created) SELECT ?,?,?,?,?,? FROM items WHERE id=? AND active=?').bind(audit,user.userId,v.active?'restore_item':'hide_item',v.id,v.reason,now,v.id,v.expectedActive)];
    if(v.active)statements.push(db.prepare('DELETE FROM item_moderation WHERE item=? AND EXISTS(SELECT 1 FROM items WHERE id=? AND active=?)').bind(v.id,v.id,v.expectedActive));

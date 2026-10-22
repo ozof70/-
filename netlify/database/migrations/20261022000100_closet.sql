@@ -1,0 +1,14 @@
+CREATE TABLE users (id TEXT PRIMARY KEY,email TEXT NOT NULL,name TEXT NOT NULL,created BIGINT NOT NULL,picture TEXT);
+CREATE TABLE items (id TEXT PRIMARY KEY,owner TEXT NOT NULL,"ownerName" TEXT NOT NULL,title TEXT NOT NULL,series TEXT NOT NULL,size TEXT NOT NULL,city TEXT NOT NULL,price INTEGER NOT NULL,deposit DOUBLE PRECISION NOT NULL,description TEXT NOT NULL,delivery TEXT NOT NULL,image TEXT NOT NULL,created BIGINT NOT NULL,active INTEGER NOT NULL DEFAULT 1,details TEXT NOT NULL DEFAULT '{}',photos TEXT NOT NULL DEFAULT '[]');
+CREATE TABLE bookings (id TEXT PRIMARY KEY,item TEXT NOT NULL REFERENCES items(id),renter TEXT NOT NULL,"renterName" TEXT NOT NULL,start TEXT NOT NULL,"end" TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending',total INTEGER NOT NULL);
+CREATE TABLE oauth_attempts (hash TEXT PRIMARY KEY,verifier TEXT NOT NULL,nonce TEXT NOT NULL,expires BIGINT NOT NULL);
+CREATE TABLE sessions (hash TEXT PRIMARY KEY,"userId" TEXT NOT NULL REFERENCES users(id),expires BIGINT NOT NULL);
+CREATE TABLE item_moderation (item TEXT PRIMARY KEY REFERENCES items(id),reason TEXT NOT NULL,actor TEXT NOT NULL REFERENCES users(id),updated BIGINT NOT NULL);
+CREATE TABLE admin_audit (id TEXT PRIMARY KEY,actor TEXT NOT NULL REFERENCES users(id),action TEXT NOT NULL,target TEXT NOT NULL,reason TEXT NOT NULL,created BIGINT NOT NULL);
+CREATE TABLE app_migrations (name TEXT PRIMARY KEY,checksum TEXT NOT NULL);
+CREATE INDEX idx_items_owner ON items(owner);
+CREATE INDEX idx_bookings_item_dates ON bookings(item,start,"end");
+CREATE INDEX idx_bookings_renter ON bookings(renter);
+CREATE INDEX idx_sessions_expires ON sessions(expires);
+CREATE INDEX idx_oauth_attempts_expires ON oauth_attempts(expires);
+CREATE INDEX idx_admin_audit_created ON admin_audit(created);

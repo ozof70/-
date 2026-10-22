@@ -1,0 +1,13 @@
+[build]
+command = "npm run build"
+publish = ".next"
+
+[build.environment]
+NODE_VERSION = "24"
+NEXT_TELEMETRY_DISABLED = "1"
+
+[functions]
+node_bundler = "esbuild"
+
+# CLOSET_STORAGE=netlify and OAuth credentials are server-side site variables.
+# Never place database credentials or imported user data in this file.

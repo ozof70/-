@@ -20,6 +20,7 @@ let user=null;const database=()=>({prepare:sql=>new Statement(sql),async batch(l
 const compile=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
 const source=file=>readFileSync(file,'utf8').replace(/^import .*;\r?\n/gm,'');
 globalThis.draftTest={z,database,getAppUser:async()=>user,getChatGPTUser:async()=>user,trustedOrigin:()=> 'https://example.com',env:{BUCKET:{get:async()=>({body:photo,httpMetadata:{contentType:'image/jpeg'}})}}};
+Object.assign(globalThis.draftTest,await import(compile(source('lib/migration-mode.ts'))));
 try{
  assert.equal(run().status,0);const item=db.prepare('SELECT * FROM items').get();assert.equal(item.owner,'google:dennis');assert.equal(item.active,0);assert.equal(item.price,0);assert.equal(item.size,'');assert.equal(JSON.parse(item.details).draft,true);assert.equal(JSON.parse(item.photos).length,1);assert.equal(db.prepare('SELECT COUNT(*) n FROM admin_audit').get().n,1);
  db.prepare('UPDATE items SET title=? WHERE id=?').run('Owner edited title',item.id);assert.equal(run().status,0);assert.equal(db.prepare('SELECT COUNT(*) n FROM items').get().n,1);assert.equal(db.prepare('SELECT title FROM items').get().title,'Owner edited title');
@@ -30,10 +31,10 @@ try{
  const photoRoute=await import(compile('const {env,database,getAppUser,isAdmin,isDraft}=globalThis.draftTest;\n'+source('app/api/photos/[id]/route.ts')));
  const photoId=JSON.parse(item.photos)[0].split('/').pop();const readPhoto=()=>photoRoute.GET(new Request('https://example.com/api/photos/'+photoId),{params:Promise.resolve({id:photoId})});
  assert.equal((await readPhoto()).status,404);user={userId:'google:other',email:'other@example.com'};assert.equal((await readPhoto()).status,404);user={userId:'google:dennis',email:batch.ownerEmail};assert.equal((await readPhoto()).status,200);
- const closetRoute=await import(compile('const {isAdmin,getChatGPTUser,database,env,trustedOrigin,listingDetailsSchema,parseDetails,parsePhotos,isDraft,rentalListingSchema,rentalTotal}=globalThis.draftTest;\n'+source('app/api/closet/route.ts')));
+ const closetRoute=await import(compile('const {isAdmin,getChatGPTUser,database,env,trustedOrigin,listingDetailsSchema,parseDetails,parsePhotos,isDraft,rentalListingSchema,rentalTotal,migrationResponse}=globalThis.draftTest;\n'+source('app/api/closet/route.ts')));
  const post=(body,origin='https://example.com')=>closetRoute.POST(new Request('https://example.com/api/closet',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)}));
  assert.equal((await post({action:'availability',item:item.id,active:true})).status,409);
- const adminRoute=await import(compile('const {getAppUser,isAdmin,database,trustedOrigin,z,isDraft}=globalThis.draftTest;\n'+source('app/api/admin/route.ts')));
+ const adminRoute=await import(compile('const {getAppUser,isAdmin,database,trustedOrigin,z,isDraft,migrationResponse}=globalThis.draftTest;\n'+source('app/api/admin/route.ts')));
  assert.equal((await adminRoute.POST(new Request('https://example.com/api/admin',{method:'POST',headers:{origin:'https://example.com','content-type':'application/json'},body:JSON.stringify({action:'moderate',id:item.id,active:true,expectedActive:0,reason:'Test publish'})}))).status,400);
  const fields={title:'Completed costume',series:'Test series',ownerName:'Dennis',size:'M',city:'台北市',price:300,deposit:1000,description:'Verified costume description.',delivery:'面交'};
  assert.equal((await post({action:'completeDraft',id:item.id,fields},'https://evil.example')).status,403);

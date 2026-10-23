@@ -1,25 +1,39 @@
-# Netlify migration status
+# Netlify production migration
 
-Target: `coz-cos-closet` (site ID `f084c632-7093-46eb-a3e6-2619c97fc4be`).
-Production domain remains `https://closet.cozcos.com` on Railway until cutover verification.
+Production: https://closet.cozcos.com
+Netlify project: coz-cos-closet (f084c632-7093-46eb-a3e6-2619c97fc4be).
+Published deployment: 6adb2cd9826270a36a3c9d51.
+Completed checks: 2026-10-23 (Asia/Taipei).
 
-## Prepared
+## Data and authentication
 
-- Netlify site and database provisioned in the existing Netlify account.
-- `CLOSET_STORAGE=netlify` selects Postgres and Netlify Blobs; unset retains the existing SQLite / disk backend.
-- Native Netlify migration defines the schema. Credentials remain server-side site variables.
-- Existing parameterized SQL and atomic administrator audit transactions retained.
-- Photos retain their existing URLs and access checks; private photos must remain private.
+- PostgreSQL and site-scoped Netlify Blobs replace Railway SQLite / disk in production. Local development retains the SQLite backend.
+- Imported 36 listings (35 public, one hidden), 205 original photo files, five users, two bookings, four sessions, moderation and audit records.
+- A final source snapshot was taken while SQLite writes were locked. Users, listings, prices, deposits, bookings and audit history matched exactly after import.
+- All 205 photo objects passed SHA-256 verification; all 102 public display images passed HTTP checks. Hidden photos remained inaccessible to anonymous visitors.
+- Google / LINE credentials and all four administrator emails match the previous production configuration. SITE_URL remains https://closet.cozcos.com.
+- Production OAuth start routes return 303 to the correct providers with Secure / HttpOnly state cookies and canonical callback URLs. Invalid callbacks are rejected. A full interactive provider login was not completed because the browser verification tool timed out.
+- CLOSET_STORAGE=netlify; CLOSET_READ_ONLY=0. Temporary personal-token database write access was disabled and verified read-only after import.
 
-## Required before cutover
+## Domain and source retirement
 
-1. Renew Railway login, export a consistent current SQLite snapshot and all upload files; retain backups outside the public repository.
-2. Apply the Postgres schema through Netlify's deployment migration lifecycle.
-3. Import original IDs, users, sessions, items, bookings, moderation and audit records; preserve prices, pending status and image order.
-4. Upload every photo to the `closet-photos` site store with the existing object key, verifying hashes and dimensions.
-5. Transfer current Google / LINE credentials and the complete administrator allowlist securely; keep `SITE_URL=https://closet.cozcos.com`.
-6. Verify isolated data import, authentication, administrator edits, bookings, photo permissions, responsive layouts and SEO on the Netlify deployment.
-7. Briefly prevent source writes for a final synchronized import; switch only `closet.cozcos.com` DNS once the new deployment passes checks.
-8. Verify the custom domain's TLS and both login callbacks. Keep a rollback deployment and source backup until stability is confirmed.
+- Name.com closet CNAME targets coz-cos-closet.netlify.app. Netlify DNS has matching NETLIFY / NETLIFYv6 records. The root website and other records were preserved.
+- TLS certificate issued for closet.cozcos.com. Production visibility is Public; deploy previews remain Private.
+- Railway deployment 5d009a03-0cd2-45aa-b1d4-956c8260d03e was stopped. The old deployment, service and data volume were retained for recovery; no source data was deleted.
+- The temporary Railway SSH key was revoked; the registered-key list was empty, and only the temporary local key files were removed.
+- Private snapshots and detailed integrity reports remain in the approved work-tools directory outside the application repository and source exports.
 
-Latest checkpoint (2026-10-23): Railway authorization restored. A private snapshot contains 36 items, 205 photo files, 5 users and 2 bookings, with session, moderation and audit data retained. Google / LINE credentials and the four-administrator allowlist have been transferred securely. Deployment 6adae328acf81a84f38246ca is published successfully with API-level maintenance guards. Database health passes when accessed through the existing team login. All 205 photo objects were uploaded. Row import rolled back completely because the API database role is netlifydb_readonly; enabling temporary PAT write access awaits explicit confirmation. Production visibility remains private pending confirmation to publish production while retaining private previews. Data import and final synchronized cutover remain pending. Production remains on Railway; no source data has been removed. DNS edits require the pending explicit approval because mixed Name.com / Netlify name servers were detected.
+## Deploy future updates
+
+Use Node 24 and the full Next.js adapter build:
+
+```sh
+npx netlify-cli deploy --build --prod --context production --site f084c632-7093-46eb-a3e6-2619c97fc4be
+```
+
+Do not deploy the raw .next directory with --no-build: it contains internal server files. The Netlify adapter must package the public assets and server function.
+
+## Platform limit
+
+Netlify buffered function requests are limited to 6 MB, approximately 4.5 MB for binary uploads after Base64 overhead. Existing imported photos are unaffected. The existing multi-photo form still advertises its earlier 20 MB aggregate / 5 MB per-file limit; large new uploads require a separate direct or chunked upload implementation. Until then, keep each submitted form's photo total below 4 MB.
+Reference: https://docs.netlify.com/build/functions/configuration/

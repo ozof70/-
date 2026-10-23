@@ -22,4 +22,4 @@ Production domain remains `https://closet.cozcos.com` on Railway until cutover v
 7. Briefly prevent source writes for a final synchronized import; switch only `closet.cozcos.com` DNS once the new deployment passes checks.
 8. Verify the custom domain's TLS and both login callbacks. Keep a rollback deployment and source backup until stability is confirmed.
 
-Railway's login was rejected during preparation. No production data was exported, no source data was removed, and no domain was switched.
+Latest checkpoint (2026-10-23): Railway authorization restored. A private snapshot contains 36 items, 205 photo files, 5 users and 2 bookings, with session, moderation and audit data retained. Google / LINE credentials and the four-administrator allowlist have been transferred securely. Initial deployment encountered a Windows middleware bundling error; API-level maintenance guards replace the middleware and deployment is being retried. Data import and final synchronized cutover remain pending. Production remains on Railway; no source data has been removed. DNS edits require the pending explicit approval because mixed Name.com / Netlify name servers were detected.

@@ -1,9 +1,10 @@
+import {migrationResponse} from '@/lib/migration-mode';
 import {lineConfig,LINE_STATE_COOKIE} from '@/lib/line-auth';
 import {database} from '@/db/raw';
 import {digest,randomToken,readCookie,SESSION_AGE,SESSION_COOKIE,tokenCookie} from '@/lib/auth';
 import {trustedOrigin} from '@/lib/runtime-env';
 export const dynamic='force-dynamic';
-export async function GET(req:Request){
+export async function GET(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;
  const cfg=lineConfig();if(!cfg)return Response.redirect(trustedOrigin(req)+'/login?error=line_setup',303);
  function redirect(path:string,session?:string){const h=new Headers({Location:cfg!.origin+path,'Cache-Control':'no-store','Referrer-Policy':'no-referrer'});h.append('Set-Cookie',tokenCookie(LINE_STATE_COOKIE,'',0,cfg!.origin));if(session)h.append('Set-Cookie',tokenCookie(SESSION_COOKIE,session,SESSION_AGE,cfg!.origin));return new Response(null,{status:303,headers:h})}
  try{

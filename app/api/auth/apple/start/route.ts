@@ -1,9 +1,10 @@
+import {migrationResponse} from '@/lib/migration-mode';
 import {database} from '@/db/raw';
 import {digest,randomToken} from '@/lib/auth';
 import {appleConfig,appleClientSecret,appleStateCookie} from '@/lib/apple-auth';
 import {trustedOrigin} from '@/lib/runtime-env';
 export const dynamic='force-dynamic';
-export async function GET(req:Request){
+export async function GET(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;
  const cfg=appleConfig();if(!cfg)return Response.redirect(trustedOrigin(req)+'/login?error=apple_setup',303);
  try{
   // Validate the configured signing key before sending the visitor to Apple.

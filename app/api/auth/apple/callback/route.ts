@@ -1,9 +1,10 @@
+import {migrationResponse} from '@/lib/migration-mode';
 import {database} from '@/db/raw';
 import {digest,randomToken,readCookie,SESSION_COOKIE,SESSION_AGE,tokenCookie} from '@/lib/auth';
 import {appleConfig,appleClientSecret,appleStateCookie,APPLE_STATE_COOKIE,verifyAppleIdentity,appleDisplayName} from '@/lib/apple-auth';
 import {trustedOrigin} from '@/lib/runtime-env';
 export const dynamic='force-dynamic';
-export async function POST(req:Request){
+export async function POST(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;
  const cfg=appleConfig();if(!cfg)return Response.redirect(trustedOrigin(req)+'/login?error=apple_setup',303);
  function redirect(path:string,session?:string){const h=new Headers({Location:cfg!.origin+path,'Cache-Control':'no-store','Referrer-Policy':'no-referrer'});h.append('Set-Cookie',appleStateCookie('',0));if(session)h.append('Set-Cookie',tokenCookie(SESSION_COOKIE,session,SESSION_AGE,cfg!.origin));return new Response(null,{status:303,headers:h})}
  try{
@@ -32,4 +33,4 @@ export async function POST(req:Request){
   return redirect('/explore',session);
  }catch{console.error('Apple login verification failed');return redirect('/login?error=failed')}
 }
-export async function GET(req:Request){return Response.redirect(trustedOrigin(req)+'/login?error=expired',303)}
+export async function GET(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;return Response.redirect(trustedOrigin(req)+'/login?error=expired',303)}

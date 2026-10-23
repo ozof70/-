@@ -1,3 +1,4 @@
+import {migrationResponse} from '@/lib/migration-mode';
 import {getAppUser} from '@/lib/auth';
 import {isAdmin} from '@/lib/admin-auth';
 import {database} from '@/db/raw';
@@ -28,7 +29,7 @@ const mutation=z.discriminatedUnion('action',[
  z.object({action:z.literal('moderate'),id:z.string().min(1).max(200),active:z.boolean(),expectedActive:z.number().int().min(0).max(1),reason:z.string().trim().min(2).max(300)}),
  z.object({action:z.literal('cancel'),id:z.string().min(1).max(200),expectedStatus:z.enum(['pending','accepted']),reason:z.string().trim().min(2).max(300)})
 ]);
-export async function POST(req:Request){
+export async function POST(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;
  if(req.headers.get('origin')!==trustedOrigin(req))return response({error:'來源不符'},403);
  const user=await getAppUser();if(!user)return response({error:'請先登入'},401);if(!isAdmin(user))return response({error:'沒有管理員權限'},403);
  if(!req.headers.get('content-type')?.includes('application/json'))return response({error:'格式不符'},415);

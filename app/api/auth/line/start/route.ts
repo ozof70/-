@@ -1,9 +1,10 @@
+import {migrationResponse} from '@/lib/migration-mode';
 import {lineConfig,LINE_STATE_COOKIE} from '@/lib/line-auth';
 import {database} from '@/db/raw';
 import {digest,randomToken,tokenCookie} from '@/lib/auth';
 import {trustedOrigin} from '@/lib/runtime-env';
 export const dynamic='force-dynamic';
-export async function GET(req:Request){
+export async function GET(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;
  const cfg=lineConfig();if(!cfg)return Response.redirect(trustedOrigin(req)+'/login?error=line_setup',303);
  try{const state=randomToken(),verifier=randomToken(),nonce=randomToken();const db=database();
   await db.batch([db.prepare('DELETE FROM oauth_attempts WHERE expires<?').bind(Date.now()),db.prepare('INSERT INTO oauth_attempts (hash,verifier,nonce,expires) VALUES (?,?,?,?)').bind(await digest('line:'+state),verifier,nonce,Date.now()+600000)]);

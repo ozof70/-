@@ -1,3 +1,4 @@
+import {migrationResponse} from '@/lib/migration-mode';
 import {rentalTotal} from '@/lib/pricing';
 import {isAdmin} from '@/lib/admin-auth';
 import {getAppUser as getChatGPTUser} from '@/lib/auth';
@@ -11,7 +12,7 @@ const fail=(error:string,status=400)=>Response.json({error},{status});
 export async function GET(req:Request){try{const user=await getChatGPTUser();const db=database();const id=new URL(req.url).searchParams.get('availability');if(id){const dates=await db.prepare("SELECT start,end FROM bookings WHERE item=? AND status='accepted' AND end>=? ORDER BY start").bind(id,new Date().toISOString().slice(0,10)).all();return Response.json({dates:dates.results})}const items=await db.prepare('SELECT * FROM items WHERE active=1 OR owner=? ORDER BY created DESC LIMIT 500').bind(user?.userId??'').all();const bookings=user?await db.prepare('SELECT b.*,i.title,i.owner,i.details FROM bookings b JOIN items i ON i.id=b.item WHERE b.renter=? OR i.owner=? ORDER BY b.start DESC').bind(user.userId,user.userId).all():{results:[]};return Response.json({items:items.results.map(i=>({...i,details:parseDetails(i.details),photos:parsePhotos(i.photos,String(i.image))})),bookings:bookings.results.map(b=>({...b,details:parseDetails(b.details)})),user:user?{id:user.userId,name:user.fullName??'我的衣櫃',picture:user.picture,admin:isAdmin(user)}:null})}catch(e){console.error(e);return fail('衣櫃暫時無法載入，請稍後重試。',503)}}
 const input=rentalListingSchema;
 function validDate(v:unknown):v is string{return typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&!isNaN(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v}
-export async function POST(req:Request){try{
+export async function POST(req:Request){const maintenance=migrationResponse();if(maintenance)return maintenance;try{
  const origin=req.headers.get('origin');if(origin&&origin!==trustedOrigin(req))return fail('來源不符',403);
  const user=await getChatGPTUser();if(!user)return fail('請先登入再繼續。',401);const db=database();
  if(req.headers.get('content-type')?.includes('multipart/form-data')){
